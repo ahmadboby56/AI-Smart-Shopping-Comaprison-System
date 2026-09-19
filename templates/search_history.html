@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+
+{% block title %}Search History - Smart Shopping{% endblock %}
+
+{% block extra_css %}
+<style>
+    .history-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 1.5rem;
+        padding: 2.5rem;
+        box-shadow: var(--shadow);
+    }
+
+    .history-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+    }
+
+    .history-header h2 {
+        font-size: 1.75rem;
+        font-weight: 800;
+        color: var(--text-main);
+    }
+
+    .history-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1.25rem 1.5rem;
+        border-bottom: 1px solid var(--border);
+        transition: var(--transition);
+        border-radius: 1rem;
+        text-decoration: none;
+        color: inherit;
+    }
+
+    .history-item:hover {
+        background: var(--bg-body);
+        transform: translateX(5px);
+    }
+
+    .history-info {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+
+    .history-query {
+        font-weight: 700;
+        font-size: 1.1rem;
+        color: var(--primary);
+    }
+
+    .history-meta {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+    }
+
+    .history-action {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .results-count {
+        background: rgba(99, 102, 241, 0.1);
+        color: var(--primary);
+        padding: 0.25rem 0.75rem;
+        border-radius: 9999px;
+        font-size: 0.75rem;
+        font-weight: 700;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+    }
+
+    .empty-icon {
+        font-size: 4rem;
+        color: var(--text-muted);
+        margin-bottom: 1.5rem;
+        opacity: 0.3;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-top: 3rem; padding-bottom: 5rem;">
+    <div class="history-card">
+        <div class="history-header">
+            <div>
+                <h2>Your Search History</h2>
+                <p style="color: var(--text-muted); margin-top: 0.5rem;">Re-run your previous searches instantly.</p>
+            </div>
+            {% if history %}
+            <form action="{{ url_for('clear_history') }}" method="POST"
+                onsubmit="return confirm('Are you sure you want to clear your entire search history?');">
+                <button type="submit" class="btn-action"
+                    style="background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.1); padding: 0.6rem 1.25rem; border-radius: 0.75rem; font-weight: 700;">
+                    <i class="fas fa-trash-alt" style="margin-right: 0.5rem;"></i> Clear History
+                </button>
+            </form>
+            {% endif %}
+        </div>
+
+        <div class="history-list">
+            {% if history %}
+            {% for item in history %}
+            <a href="{{ url_for('dashboard', q=item.query) }}" class="history-item">
+                <div class="history-info">
+                    <span class="history-query">{{ item.query }}</span>
+                    <span class="history-meta">
+                        <i class="far fa-clock" style="margin-right: 0.3rem;"></i>
+                        {{ item.timestamp }}
+                    </span>
+                </div>
+                <div class="history-action">
+                    <span class="results-count">{{ item.results_count }} Results</span>
+                    <i class="fas fa-chevron-right" style="color: var(--text-muted); font-size: 0.8rem;"></i>
+                </div>
+            </a>
+            {% endfor %}
+            {% else %}
+            <div class="empty-state">
+                <div class="empty-icon"><i class="fas fa-history"></i></div>
+                <h3 style="color: var(--text-main); font-weight: 700;">No history yet</h3>
+                <p style="color: var(--text-muted); margin-top: 0.5rem;">Your searches will appear here for quick access
+                    later.</p>
+                <a href="{{ url_for('dashboard') }}" class="btn-primary"
+                    style="display: inline-block; margin-top: 2rem; padding: 0.875rem 2rem;">Start Searching</a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

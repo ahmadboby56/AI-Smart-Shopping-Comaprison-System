@@ -1,0 +1,2511 @@
+{% extends "base.html" %}
+
+{% block title %}Search Results - Smart Shopping{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Dashboard Modern Styles */
+    .dashboard-header {
+        margin-bottom: 3rem;
+    }
+
+    .dashboard-stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2.5rem;
+    }
+
+    .stat-card {
+        background: var(--bg-card);
+        padding: 1.5rem;
+        border-radius: 1rem;
+        border: 1px solid var(--border);
+        text-align: center;
+    }
+
+    .stat-card .value {
+        font-size: 1.5rem;
+        font-weight: 800;
+        color: var(--primary);
+    }
+
+    .stat-card .label {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-top: 0.5rem;
+    }
+
+    .search-area {
+        background: var(--bg-card);
+        padding: 2rem;
+        border-radius: 1.5rem;
+        border: 1px solid var(--border);
+        margin-bottom: 3rem;
+        box-shadow: var(--shadow);
+    }
+
+    .results-toolbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        flex-wrap: wrap;
+        gap: 1.5rem;
+        background: var(--bg-card);
+        padding: 1.5rem 2rem;
+        border-radius: 1.5rem;
+        border: 1px solid var(--border);
+    }
+
+    .filter-section {
+        background: var(--bg-card);
+        padding: 1.5rem 2rem;
+        border-radius: 1.5rem;
+        border: 1px solid var(--border);
+        margin-bottom: 2rem;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 2rem;
+        align-items: center;
+    }
+
+    .filter-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .filter-label {
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.025em;
+    }
+
+    .price-inputs {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .price-inputs input {
+        width: 100px;
+        padding: 0.5rem 0.75rem;
+        border: 1px solid var(--border);
+        border-radius: 0.75rem;
+        background: var(--bg-body);
+        color: var(--text-main);
+        font-size: 0.9rem;
+        outline: none;
+    }
+
+    .price-inputs input:focus {
+        border-color: var(--primary);
+    }
+
+    .store-filters {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .store-checkbox {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        background: var(--bg-body);
+        border: 1px solid var(--border);
+        border-radius: 9999px;
+        cursor: pointer;
+        transition: var(--transition);
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+
+    .store-checkbox:hover {
+        border-color: var(--primary);
+    }
+
+    .store-checkbox input {
+        width: 16px;
+        height: 16px;
+        accent-color: var(--primary);
+        cursor: pointer;
+    }
+
+    .store-checkbox.active {
+        background: var(--primary);
+        color: white;
+        border-color: var(--primary);
+    }
+
+    .btn-reset-filters {
+        padding: 0.6rem 1.25rem;
+        background: transparent;
+        border: 1px solid var(--border);
+        color: var(--text-muted);
+        border-radius: 9999px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: var(--transition);
+        margin-left: auto;
+    }
+
+    .btn-reset-filters:hover {
+        background: var(--bg-body);
+        color: var(--text-main);
+        border-color: var(--text-main);
+    }
+
+    .results-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 2rem;
+    }
+
+    .product-card {
+        background: rgba(var(--bg-card-rgb), 0.7);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border-radius: 1.5rem;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        position: relative;
+        box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+        height: 100%;
+        /* Ensure all cards in a row have same height */
+        min-height: 480px;
+    }
+
+    .product-card:hover {
+        transform: translateY(-12px) scale(1.02);
+        border-color: var(--primary);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+        background: rgba(var(--bg-card-rgb), 0.9);
+    }
+
+    .deal-badge {
+        position: absolute;
+        top: 1rem;
+        left: 1rem;
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: white;
+        padding: 0.4rem 1rem;
+        border-radius: 2rem;
+        font-size: 0.75rem;
+        font-weight: 800;
+        z-index: 10;
+        box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+        animation: pulse-glow 2s infinite;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    @keyframes pulse-glow {
+        0% {
+            box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4);
+        }
+
+        70% {
+            box-shadow: 0 0 0 10px rgba(16, 185, 129, 0);
+        }
+
+        100% {
+            box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+        }
+    }
+
+    .img-container {
+        width: 100%;
+        height: 220px;
+        background: white;
+        padding: 1.5rem;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .img-container img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+    }
+
+    .card-body {
+        padding: 1.5rem;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        /* Push actions to the bottom */
+    }
+
+    .card-source {
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: var(--primary);
+        margin-bottom: 0.5rem;
+    }
+
+    .card-title {
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--text-main);
+        margin-bottom: 1rem;
+        line-height: 1.4;
+        height: 2.8rem;
+        overflow: hidden;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        line-clamp: 2;
+        -webkit-box-orient: vertical;
+        word-break: break-word;
+        /* Prevent long words from stretching */
+        overflow-wrap: break-word;
+    }
+
+    .card-price {
+        font-size: 1.25rem;
+        font-weight: 800;
+        color: var(--text-main);
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .trend-tag {
+        font-size: 0.7rem;
+        padding: 0.2rem 0.5rem;
+        border-radius: 0.375rem;
+        font-weight: 700;
+    }
+
+    .trend-up {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+
+    .trend-down {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    .card-actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.75rem;
+        margin-top: auto;
+    }
+
+    .btn-view-deal {
+        background: var(--primary);
+        color: white;
+        padding: 0.75rem 1rem;
+        border-radius: 0.75rem;
+        font-weight: 700;
+        font-size: 0.85rem;
+        text-decoration: none;
+        text-align: center;
+        transition: all 0.3s ease;
+        border: none;
+        box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
+    }
+
+    .btn-view-deal:hover {
+        background: var(--primary-hover);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 15px rgba(99, 102, 241, 0.3);
+    }
+
+    .btn-outline {
+        background: transparent;
+        border: 1px solid var(--border);
+        color: var(--text-main);
+        padding: 0.6rem 1rem;
+        border-radius: 0.5rem;
+        font-weight: 600;
+        font-size: 0.85rem;
+        text-decoration: none;
+        text-align: center;
+        transition: var(--transition);
+    }
+
+    .btn-outline:hover {
+        border-color: var(--primary);
+        color: var(--primary);
+    }
+
+    .btn-wishlist {
+        position: absolute;
+        top: 1rem;
+        right: 4.2rem;
+        width: 2.5rem;
+        height: 2.5rem;
+        border-radius: 50%;
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        color: var(--text-muted);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: var(--transition);
+        z-index: 10;
+    }
+
+    .btn-wishlist:hover {
+        color: #ef4444;
+        border-color: #ef4444;
+        transform: scale(1.1);
+    }
+
+    .no-data {
+        text-align: center;
+        padding: 5rem 2rem;
+        background: var(--bg-card);
+        border-radius: 1.5rem;
+        border: 1px dashed var(--border);
+    }
+
+    /* Trust Score UI */
+    .trust-badge-direct {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        z-index: 15;
+    }
+
+    .trust-score-circle {
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        background: var(--bg-card);
+        border: 2px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.75rem;
+        font-weight: 800;
+        color: var(--text-main);
+        box-shadow: var(--shadow);
+        transition: var(--transition);
+        position: relative;
+    }
+
+    .trust-high {
+        border-color: #10b981;
+        color: #10b981;
+    }
+
+    .trust-medium {
+        border-color: #f59e0b;
+        color: #f59e0b;
+    }
+
+    .trust-low {
+        border-color: #ef4444;
+        color: #ef4444;
+    }
+
+    .trust-label {
+        font-size: 0.65rem;
+        font-weight: 700;
+        padding: 0.1rem 0.4rem;
+        border-radius: 0.25rem;
+        margin-top: 0.25rem;
+        text-transform: uppercase;
+    }
+
+    .trust-label.high {
+        background: rgba(16, 185, 129, 0.1);
+        color: #10b981;
+    }
+
+    .trust-label.medium {
+        background: rgba(245, 158, 11, 0.1);
+        color: #f59e0b;
+    }
+
+    .trust-label.low {
+        background: rgba(239, 68, 68, 0.1);
+        color: #ef4444;
+    }
+
+    .trust-bar-container {
+        height: 4px;
+        width: 100%;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 2px;
+        margin: 0.5rem 0;
+        overflow: hidden;
+    }
+
+    .trust-bar-fill {
+        height: 100%;
+        transition: width 0.5s ease;
+    }
+
+    .search-within {
+        position: relative;
+        flex: 1;
+        min-width: 250px;
+    }
+
+    .search-within input {
+        width: 100%;
+        padding: 0.6rem 1rem 0.6rem 2.5rem;
+        border: 1px solid var(--border);
+        border-radius: 9999px;
+        background: var(--bg-body);
+        color: var(--text-main);
+        font-size: 0.9rem;
+        outline: none;
+    }
+
+    .search-within i {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text-muted);
+    }
+
+    /* Loading Spinner */
+    .loader {
+        width: 48px;
+        height: 48px;
+        border: 5px solid var(--border);
+        border-bottom-color: var(--primary);
+        border-radius: 50%;
+        display: inline-block;
+        box-sizing: border-box;
+        animation: rotation 1s linear infinite;
+    }
+
+    @keyframes rotation {
+        0% {
+            transform: rotate(0deg);
+        }
+
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+
+    /* Skeleton Loading Styles */
+    .skeleton-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 2rem;
+    }
+
+    .skeleton-card {
+        background: rgba(var(--bg-card-rgb), 0.5);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border-radius: 1.5rem;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        overflow: hidden;
+        height: 480px;
+        position: relative;
+    }
+
+    .shimmer {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg,
+                transparent 0%,
+                rgba(255, 255, 255, 0.05) 50%,
+                transparent 100%);
+        background-size: 200% 100%;
+        animation: shimmer-effect 1.5s infinite;
+    }
+
+    @keyframes shimmer-effect {
+        0% {
+            background-position: -200% 0;
+        }
+
+        100% {
+            background-position: 200% 0;
+        }
+    }
+
+    .skeleton-img {
+        height: 220px;
+        background: rgba(255, 255, 255, 0.05);
+        margin: 1.5rem;
+        border-radius: 1rem;
+    }
+
+    .skeleton-line {
+        height: 1rem;
+        background: rgba(255, 255, 255, 0.05);
+        margin: 0.75rem 1.5rem;
+        border-radius: 0.5rem;
+    }
+
+    .skeleton-line.short {
+        width: 40%;
+    }
+
+    .skeleton-line.medium {
+        width: 70%;
+    }
+
+    .skeleton-line.long {
+        width: 90%;
+    }
+
+    /* Modal Customization */
+    .modal {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(15, 23, 42, 0.75);
+        backdrop-filter: blur(8px);
+        z-index: 2000;
+        padding: 1.5rem;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .modal-content {
+        background: var(--bg-card);
+        width: 100%;
+        max-width: 900px;
+        padding: 3rem;
+        border-radius: 2rem;
+        position: relative;
+        box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.5);
+    }
+
+    /* Side-by-Side Comparison Feature */
+    .compare-bar {
+        position: fixed;
+        bottom: 1.5rem;
+        left: 50%;
+        transform: translateX(-50%);
+        background: var(--bg-card);
+        border: 2px solid var(--primary);
+        box-shadow: 0 8px 32px rgba(79, 70, 229, 0.4);
+        padding: 1rem 2.5rem;
+        border-radius: 99px;
+        display: none;
+        align-items: center;
+        gap: 2rem;
+        z-index: 99999;
+    }
+
+    @keyframes jiggle {
+        0% {
+            transform: translateX(-50%) scale(1);
+        }
+
+        25% {
+            transform: translateX(-50%) scale(1.05) rotate(1deg);
+        }
+
+        50% {
+            transform: translateX(-50%) scale(1.05) rotate(-1deg);
+        }
+
+        100% {
+            transform: translateX(-50%) scale(1);
+        }
+    }
+
+    @keyframes pulse-highlight {
+        0% {
+            box-shadow: 0 0 0 0 rgba(79, 70, 229, 0.4);
+        }
+
+        70% {
+            box-shadow: 0 0 0 15px rgba(79, 70, 229, 0);
+        }
+
+        100% {
+            box-shadow: 0 0 0 0 rgba(79, 70, 229, 0);
+        }
+    }
+
+    .pulse-highlight {
+        animation: pulse-highlight 2s infinite;
+        background: linear-gradient(135deg, var(--primary), #6366f1) !important;
+        border-radius: 99px;
+    }
+
+    .compare-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 1.5rem;
+    }
+
+    .compare-table th,
+    .compare-table td {
+        padding: 1rem;
+        border: 1px solid var(--border);
+        text-align: left;
+        color: var(--text-main);
+    }
+
+    .compare-table th {
+        background: var(--bg-body);
+        font-weight: 600;
+        width: 120px;
+    }
+
+    .compare-table img {
+        max-width: 100px;
+        max-height: 100px;
+        object-fit: contain;
+    }
+
+    /* Autocomplete Suggestions */
+    .autocomplete-suggestions {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 1rem;
+        margin-top: 0.5rem;
+        box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        z-index: 50;
+        overflow: hidden;
+        display: none;
+    }
+
+    .suggestion-item {
+        padding: 0.75rem 1.5rem;
+        cursor: pointer;
+        color: var(--text-main);
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        transition: var(--transition);
+        border-bottom: 1px solid var(--border);
+    }
+
+    .suggestion-item:last-child {
+        border-bottom: none;
+    }
+
+    .suggestion-item:hover {
+        background: var(--bg-body);
+        color: var(--primary);
+    }
+
+    /* Modern Landing Page Styles merged from index.html */
+    .hero-section {
+        text-align: center;
+        margin-bottom: 4rem;
+        padding: 6rem 2rem;
+        background: radial-gradient(circle at top right, rgba(99, 102, 241, 0.2), transparent),
+            radial-gradient(circle at bottom left, rgba(16, 185, 129, 0.1), transparent),
+            #0f172a;
+        border-radius: 2.5rem;
+        color: white;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        position: relative;
+        overflow: hidden;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .hero-content {
+        position: relative;
+        z-index: 1;
+    }
+
+    .hero-section h1 {
+        font-size: 3.5rem;
+        margin-bottom: 1.5rem;
+        letter-spacing: -0.025em;
+        font-weight: 800;
+    }
+
+    .hero-section p {
+        font-size: 1.25rem;
+        color: #94a3b8;
+        margin-bottom: 3rem;
+        max-width: 600px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .hero-search {
+        display: flex;
+        max-width: 800px;
+        margin: 0 auto;
+        background: var(--white);
+        padding: 0.5rem;
+        border-radius: 9999px;
+        box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+    }
+
+    [data-theme="dark"] .hero-search {
+        background: #1e293b;
+        border: 1px solid #334155;
+    }
+
+    .hero-search input {
+        flex: 1;
+        padding: 1rem 2rem;
+        border: none;
+        outline: none;
+        font-size: 1.1rem;
+        background: transparent;
+        color: var(--text-main);
+    }
+
+    .hero-search button {
+        background: var(--primary);
+        color: white;
+        border: none;
+        padding: 0 2.5rem;
+        border-radius: 9999px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: var(--transition);
+    }
+
+    .hero-search button:hover {
+        background: var(--primary-hover);
+        transform: scale(1.05);
+    }
+
+    .section-header {
+        text-align: left;
+        margin: 4rem 0 2rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .section-header h2 {
+        font-size: 1.75rem;
+        color: var(--text-main);
+        font-weight: 700;
+    }
+
+    .section-header .accent-line {
+        flex: 1;
+        height: 1px;
+        background: var(--border);
+    }
+
+    /* Featured Grid */
+    .featured-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 2rem;
+        margin-bottom: 4rem;
+    }
+
+    .featured-card {
+        background: var(--bg-card);
+        padding: 1.5rem;
+        border-radius: 1.25rem;
+        border: 1px solid var(--border);
+        transition: var(--transition);
+        text-decoration: none;
+        color: inherit;
+        display: flex;
+        flex-direction: column;
+        box-shadow: var(--shadow);
+    }
+
+    .featured-card:hover {
+        transform: translateY(-8px);
+        border-color: var(--primary);
+        box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+    }
+
+    .featured-card img {
+        width: 100%;
+        height: 180px;
+        object-fit: contain;
+        margin-bottom: 1.5rem;
+        border-radius: 0.75rem;
+        background: white;
+        padding: 1rem;
+    }
+
+    .featured-card .price {
+        color: var(--primary);
+        font-weight: 800;
+        font-size: 1.25rem;
+        margin-top: auto;
+    }
+
+    /* Category Grid */
+    .categories-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 2rem;
+        margin-bottom: 5rem;
+    }
+
+    .category-card {
+        background: rgba(var(--bg-card-rgb), 0.6);
+        backdrop-filter: blur(8px);
+        padding: 2.5rem 2rem;
+        border-radius: 2rem;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        text-align: center;
+        transition: all 0.3s ease;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+    }
+
+    .category-card:hover {
+        transform: translateY(-5px);
+        border-color: var(--primary);
+        background: var(--bg-body);
+    }
+
+    .category-card i {
+        font-size: 2.5rem;
+        color: var(--primary);
+        margin-bottom: 1.5rem;
+        display: block;
+    }
+
+    .category-card h3 {
+        margin-bottom: 1.5rem;
+        font-size: 1.25rem;
+        font-weight: 700;
+    }
+
+    .sub-links {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .sub-link {
+        padding: 0.85rem;
+        background: var(--bg-body);
+        border-radius: 1rem;
+        text-decoration: none;
+        color: var(--text-main);
+        font-weight: 600;
+        font-size: 0.9rem;
+        transition: var(--transition);
+        border: 1px solid transparent;
+    }
+
+    .sub-link:hover {
+        background: var(--primary);
+        color: white;
+        border-color: var(--primary);
+    }
+
+    .visual-search-btn {
+        background: var(--bg-body);
+        border: 1px solid var(--border);
+        border-left: none;
+        padding: 0 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: var(--transition);
+        color: var(--text-muted);
+        border-radius: 0 9999px 9999px 0;
+        font-size: 1.2rem;
+    }
+
+    .visual-search-btn:hover {
+        color: var(--primary);
+        background: var(--bg-card);
+    }
+
+    .visual-search-preview {
+        position: absolute;
+        bottom: -60px;
+        left: 20px;
+        background: var(--bg-card);
+        padding: 5px;
+        border-radius: 8px;
+        box-shadow: var(--shadow);
+        display: none;
+        align-items: center;
+        gap: 10px;
+        z-index: 100;
+        border: 1px solid var(--primary);
+    }
+
+    .visual-search-preview img {
+        width: 40px;
+        height: 40px;
+        object-fit: cover;
+        border-radius: 4px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+{% if not request.args.get('q') %}
+<!-- Hero Section from index.html -->
+<div class="hero-section">
+    <div class="hero-content">
+        <h1>Smart Shopping </h1>
+        <p>Compare prices from Daraz, Amazon, and eBay in one place and save time and get discount</p>
+        <form class="hero-search" action="{{ url_for('dashboard') }}" method="GET" id="inlineSearch">
+            <div style="flex: 1; position: relative;">
+                <div style="display: flex; align-items: center;">
+                    <input type="text" name="q" id="searchInput" placeholder="What are you looking for today?" required
+                        autocomplete="off" style="width: 100%; border-radius: 9999px 0 0 9999px;">
+                    <button type="button" id="voiceSearchBtn" class="visual-search-btn" title="Search by Voice"
+                        style="border-left: 1px solid var(--border); border-right: none; border-radius: 0; height: 50px;">
+                        <i class="fas fa-microphone" id="voiceSearchIcon"></i>
+                    </button>
+                    <label for="visualSearchInput" class="visual-search-btn" title="Search by Image"
+                        style="height: 50px;">
+                        <i class="fas fa-camera"></i>
+                        <input type="file" id="visualSearchInput" accept="image/*" style="display: none;">
+                    </label>
+                </div>
+                <div id="suggestionsBox" class="autocomplete-suggestions"></div>
+            </div>
+            <button type="submit" onclick="showLoading()">Search Now</button>
+        </form>
+    </div>
+</div>
+
+{% if featured_products %}
+<div class="section-header">
+    <h2>Exclusive Featured Deals</h2>
+    <div class="accent-line"></div>
+</div>
+<div class="featured-grid">
+    {% for product in featured_products %}
+    <a href="{{ url_for('redirect_store', url=product.url, store=product.source, title=product.name, price=product.price) }}"
+        target="_blank" class="featured-card">
+        <img src="{{ product.image if product.image.startswith('/static') else '/api/proxy_image?url=' + product.image }}"
+            onerror="this.onerror=null;this.src='https://via.placeholder.com/200?text={{ product.name[:10] | urlencode }}';"
+            alt="{{ product.name }}">
+        <div
+            style="font-weight:600; font-size: 1rem; margin-bottom: 0.5rem; height: 3rem; overflow: hidden; color: var(--text-main);">
+            {{ product.name }}
+        </div>
+        <div class="price">Rs. {{ "{:,.0f}".format(product.price) }}</div>
+        <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.5rem; margin-bottom: 0.5rem;">Source: {{
+            product.source }}</div>
+        <label
+            style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; font-weight: 600; color: var(--text-muted); cursor: pointer; border-top: 1px solid var(--border); padding-top: 0.5rem;">
+            <input type="checkbox" class="compare-cb" value="{{ product.name }}" data-price="{{ product.price }}"
+                data-source="{{ product.source }}" data-image="{{ product.image }}" data-url="{{ product.url }}"
+                onchange="event.stopPropagation(); handleCompareChange(this)" onclick="event.stopPropagation()"
+                style="width: 18px; height: 18px; cursor: pointer; accent-color: var(--primary);">
+            Select to Compare
+        </label>
+    </a>
+    {% endfor %}
+</div>
+{% endif %}
+
+<div class="section-header">
+    <h2>Explore Categories</h2>
+    <div class="accent-line"></div>
+</div>
+<div class="categories-grid">
+    <div class="category-card">
+        <i class="fas fa-laptop"></i>
+        <h3>Electronics</h3>
+        <div class="sub-links">
+            <a href="{{ url_for('dashboard', q='Laptops') }}" class="sub-link">Laptops & PC</a>
+            <a href="{{ url_for('dashboard', q='Smartphones') }}" class="sub-link">Latest Phones</a>
+            <a href="{{ url_for('dashboard', q='Smart Watches') }}" class="sub-link">Smart Watches</a>
+        </div>
+    </div>
+    <div class="category-card">
+        <i class="fas fa-tshirt"></i>
+        <h3>Fashion</h3>
+        <div class="sub-links">
+            <a href="{{ url_for('dashboard', q='Men Clothing') }}" class="sub-link">Men's Apparel</a>
+            <a href="{{ url_for('dashboard', q='Women Dresses') }}" class="sub-link">Women's Fashion</a>
+            <a href="{{ url_for('dashboard', q='Shoes') }}" class="sub-link">Footwear</a>
+        </div>
+    </div>
+    <div class="category-card">
+        <i class="fas fa-dumbbell"></i>
+        <h3>Sports</h3>
+        <div class="sub-links">
+            <a href="{{ url_for('dashboard', q='Gym Equipment') }}" class="sub-link">Gym & Fitness</a>
+            <a href="{{ url_for('dashboard', q='Football') }}" class="sub-link">Football Kits</a>
+            <a href="{{ url_for('dashboard', q='Cricket Gear') }}" class="sub-link">Cricket Gear</a>
+        </div>
+    </div>
+    <div class="category-card">
+        <i class="fas fa-magic"></i>
+        <h3>Beauty</h3>
+        <div class="sub-links">
+            <a href="{{ url_for('dashboard', q='Skin Care') }}" class="sub-link">Personal Care</a>
+            <a href="{{ url_for('dashboard', q='Makeup') }}" class="sub-link">Cosmetics</a>
+            <a href="{{ url_for('dashboard', q='Fragrances') }}" class="sub-link">Perfumes</a>
+        </div>
+    </div>
+</div>
+{% else %}
+<div class="dashboard-header">
+    <div class="search-area">
+        <h2 style="margin-bottom: 1.5rem; text-align: center;">Find the Best Deals</h2>
+        <form id="inlineSearchResults" action="{{ url_for('dashboard') }}" method="GET"
+            style="display:flex; gap: 0.5rem; max-width: 600px; margin: 0 auto;">
+            <div style="flex: 1; position: relative;">
+                <div style="display: flex; align-items: center; position: relative;">
+                    <i class="fas fa-search"
+                        style="position: absolute; left: 1.25rem; top: 50%; transform: translateY(-50%); color: var(--text-muted); z-index: 10;"></i>
+                    <input type="text" name="q" id="searchInputResults" placeholder="Search for products..."
+                        value="{{ request.args.get('q', '') }}" autocomplete="off"
+                        style="width: 100%; padding: 1rem 3.5rem 1rem 3.5rem; border: 1px solid var(--border); border-radius: 9999px 0 0 9999px; outline: none; background: var(--bg-body); color: var(--text-main);">
+                    <button type="button" id="voiceSearchBtnResults" class="visual-search-btn" title="Search by Voice"
+                        style="border-left: 1px solid var(--border); border-right: none; border-radius: 0; height: 50px; position: relative; z-index: 10;">
+                        <i class="fas fa-microphone" id="voiceSearchIconResults"></i>
+                    </button>
+                    <label for="visualSearchInputResults" class="visual-search-btn" title="Search by Image"
+                        style="border-radius: 0 9999px 9999px 0; height: 50px; position: relative; z-index: 10;">
+                        <i class="fas fa-camera"></i>
+                        <input type="file" id="visualSearchInputResults" name="image" accept="image/*"
+                            style="display: none;">
+                    </label>
+                </div>
+                <div id="suggestionsBoxResults" class="autocomplete-suggestions"></div>
+                <div id="visualSearchPreviewResults" class="visual-search-preview" style="bottom: -55px;">
+                    <img id="previewImgResults" src="" alt="Preview">
+                    <span id="previewTextResults">Analyzing...</span>
+                </div>
+            </div>
+            <button type="submit" class="btn-primary" style="padding: 0 2rem; border-radius: 9999px;"
+                onclick="showLoading()">Search</button>
+        </form>
+    </div>
+
+    <div class="results-toolbar">
+        <div>
+            <h3 style="font-size: 1.5rem; color: var(--text-main);">
+                Results for "<span style="color: var(--primary);">{{ request.args.get('q') }}</span>"
+            </h3>
+            {% if corrected_query %}
+            <p style="font-size: 0.95rem; margin-top: 0.25rem; color: var(--text-muted);">
+                Did you mean: <a href="{{ url_for('dashboard', q=corrected_query) }}"
+                    style="color: var(--primary); font-weight: 700; text-decoration: underline;">{{ corrected_query
+                    }}</a>?
+            </p>
+            {% endif %}
+            <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 0.25rem;">Found {{ products|length }}
+                items across multiple sources.</p>
+        </div>
+
+        <div style="display: flex; gap: 1rem; align-items: center;">
+            {% if query %}
+            <a href="{{ url_for('export_csv') }}" id="exportCsvBtn" class="btn-outline"
+                style="border-radius: 9999px; display: none;">
+                <i class="fas fa-download" style="margin-right: 0.5rem;"></i> Export CSV
+            </a>
+            {% endif %}
+
+            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                <span style="font-size: 0.9rem; font-weight: 600; color: var(--text-muted);">Sort:</span>
+                <select name="sort" id="sortSelect" onchange="handleSortChange();"
+                    style="padding: 0.6rem 2.5rem 0.6rem 1.25rem; border: 1px solid var(--border); border-radius: 9999px; background: var(--bg-card); color: var(--text-main); outline: none; cursor: pointer; appearance: none; background-image: url('data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E'); background-repeat: no-repeat; background-position: right 0.75rem center; background-size: 1rem;">
+                    <option value="low" selected>Price: Low to High</option>
+                    <option value="high">Price: High to Low</option>
+                    <option value="trust">Highest Trust Score</option>
+                    <option value="rating">Highest Rated</option>
+                </select>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if recommendations %}
+<div style="margin-top: 4rem;">
+    <div class="section-header">
+        <h2>Recommended Featured Deals</h2>
+        <div class="accent-line"></div>
+    </div>
+    <div class="featured-grid">
+        {% for rec in recommendations %}
+        <a href="{{ url_for('redirect_store', url=rec.url, store=rec.source, title=rec.name, price=rec.price) }}"
+            target="_blank" class="featured-card">
+            <img src="{{ rec.image if rec.image.startswith('/static') else '/api/proxy_image?url=' + rec.image }}"
+                onerror="this.onerror=null;this.src='https://via.placeholder.com/200?text=Premium+Deal';"
+                alt="{{ rec.name }}">
+            <div
+                style="font-weight:600; font-size: 1rem; margin-bottom: 0.5rem; height: 3rem; overflow: hidden; color: var(--text-main);">
+                {{ rec.name }}</div>
+            <div class="price">Rs. {{ "{:,.0f}".format(rec.price) }}</div>
+            <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.5rem; margin-bottom: 0.5rem;">
+                Verified Source: {{ rec.source }}</div>
+            <label
+                style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; font-weight: 600; color: var(--text-muted); cursor: pointer; border-top: 1px solid var(--border); padding-top: 0.5rem;">
+                <input type="checkbox" class="compare-cb" value="{{ rec.name }}" data-price="{{ rec.price }}"
+                    data-source="{{ rec.source }}" data-image="{{ rec.image }}" data-url="{{ rec.url }}"
+                    onchange="event.stopPropagation(); handleCompareChange(this)" onclick="event.stopPropagation()"
+                    style="width: 18px; height: 18px; cursor: pointer; accent-color: var(--primary);">
+                Select to Compare
+            </label>
+        </a>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+<div class="filter-section">
+    <div class="filter-group">
+        <span class="filter-label">Price Range (Rs.)</span>
+        <div class="price-inputs">
+            <input type="number" id="minPrice" placeholder="Min" oninput="applyFilters()">
+            <input type="number" id="maxPrice" placeholder="Max" oninput="applyFilters()">
+        </div>
+    </div>
+
+    <div class="filter-group">
+        <span class="filter-label">Trust Level</span>
+        <select id="trustFilter" onchange="applyFilters()"
+            style="padding: 0.5rem; border-radius: 0.75rem; border: 1px solid var(--border); background: var(--bg-body); color: var(--text-main);">
+            <option value="all">Any Trust</option>
+            <option value="high">High (80%+)</option>
+            <option value="medium">Medium (60%+)</option>
+        </select>
+    </div>
+
+    <div class="filter-group">
+        <span class="filter-label">Min Rating</span>
+        <select id="ratingFilter" onchange="applyFilters()"
+            style="padding: 0.5rem; border-radius: 0.75rem; border: 1px solid var(--border); background: var(--bg-body); color: var(--text-main);">
+            <option value="0">Any Rating</option>
+            <option value="4">4+ Stars</option>
+            <option value="3">3+ Stars</option>
+        </select>
+    </div>
+
+    <div class="filter-group" style="flex: 1.5;">
+        <span class="filter-label">Filter by Store</span>
+        <div class="store-filters" id="storeFilters">
+            <!-- JS populated -->
+        </div>
+    </div>
+
+
+
+    <button class="btn-reset-filters" onclick="resetFilters()">
+        <i class="fas fa-undo"></i>
+    </button>
+</div>
+
+<!-- Hidden data for JS -->
+<div id="productsData" data-products='{{ products | tojson | safe }}' style="display: none;"></div>
+{% endif %}
+
+
+<div id="scrapingStatus"
+    style="display: none; background: rgba(var(--bg-card-rgb), 0.7); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); padding: 1.5rem 2rem; border-radius: 1.5rem; border: 1px solid var(--border); margin-bottom: 2rem;">
+    <h4
+        style="margin: 0 0 1rem 0; color: var(--text-main); font-size: 1.1rem; display: flex; align-items: center; gap: 0.5rem;">
+        <i id="statusMasterIcon" class="fas fa-spinner fa-spin" style="color: var(--primary);"></i>
+        <span id="statusMasterText">Searching Across Marketplaces...</span>
+    </h4>
+    <div id="statusList" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem;">
+        <!-- JS populated -->
+    </div>
+</div>
+
+<div id="loadingIndicator" style="display: none; padding: 2rem 0;">
+    <div class="skeleton-grid">
+        {% for i in range(6) %}
+        <div class="skeleton-card">
+            <div class="shimmer"></div>
+            <div class="skeleton-img"></div>
+            <div class="skeleton-line short"></div>
+            <div class="skeleton-line long"></div>
+            <div class="skeleton-line medium"></div>
+            <div style="display: flex; gap: 1rem; padding: 0 1.5rem; margin-top: 2rem;">
+                <div class="skeleton-line" style="flex: 1; margin: 0;"></div>
+                <div class="skeleton-line" style="flex: 1; margin: 0;"></div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    <p style="text-align: center; margin-top: 2rem; font-weight: 600; color: var(--text-muted); font-size: 1.1rem;">
+        <i class="fas fa-sparkles" style="color: var(--primary); margin-right: 0.5rem;"></i>
+        Smart AI is scouring the web for your best deal...
+    </p>
+</div>
+
+<div id="productResults" class="results-grid">
+    <!-- Products will be rendered here via JS for infinite scroll -->
+</div>
+
+<!-- Scroll Anchor for Infinite Scroll -->
+<div id="scrollAnchor" style="height: 20px; margin-top: 2rem;"></div>
+
+<div id="noResults" style="display: none; grid-column: 1 / -1;">
+    <div class="no-data">
+        <i class="fas fa-search"
+            style="font-size: 3rem; color: var(--border); margin-bottom: 1.5rem; display: block;"></i>
+        <h3>No matches found</h3>
+        <p style="color: var(--text-muted); margin-top: 0.5rem;">Try searching for a different product name or category.
+        </p>
+    </div>
+</div>
+
+{% if recommendations %}
+<div style="margin-top: 6rem;">
+    <div class="section-header">
+        <h2 style="text-align: left; font-size: 1.5rem;"><i class="fas fa-wand-sparkles"
+                style="color: var(--primary); margin-right: 0.75rem;"></i>Recommended for You</h2>
+    </div>
+    <div class="results-grid">
+        {% for rec in recommendations %}
+        <div class="product-card">
+            <a href="{{ url_for('redirect_store', url=rec.url, store=rec.source, title=rec.name, price=rec.price) }}"
+                target="_blank" style="text-decoration: none; display: block;">
+                <div class="img-container">
+                    {% if rec.source in ['Shophive', 'Ubuy', 'Amazon', 'Daraz', 'Clicky.pk', 'Telemart',
+                    'PriceOye', 'Al-Fatah'] %}
+                    <img src="{{ rec.image if rec.image.startswith('/static') else url_for('proxy_image', url=rec.image) }}"
+                        onerror="this.onerror=null;this.src='https://via.placeholder.com/200?text={{ rec.name[:10] | urlencode }}...';"
+                        alt="{{ rec.name }}">
+                    {% else %}
+                    <img src="{{ rec.image }}"
+                        onerror="this.onerror=null;this.src='https://via.placeholder.com/200?text={{ rec.name[:10] | urlencode }}...';"
+                        alt="{{ rec.name }}">
+                    {% endif %}
+                </div>
+            </a>
+            <div class="card-body">
+                <div class="card-source">{{ rec.source }}</div>
+                <a href="{{ url_for('redirect_store', url=rec.url, store=rec.source, title=rec.name, price=rec.price) }}"
+                    target="_blank" style="text-decoration: none;">
+                    <div class="card-title">{{ rec.name }}</div>
+                </a>
+                <div class="card-price">Rs. {{ "{:,.0f}".format(rec.price) }}</div>
+                <div class="card-actions" style="margin-top: 0.75rem;">
+                    <a href="{{ url_for('redirect_store', url=rec.url, store=rec.source, title=rec.name, price=rec.price) }}"
+                        target="_blank" class="btn-view-deal">View Product <i class="fas fa-external-link-alt"
+                            style="margin-left: 0.5rem; font-size: 0.7rem;"></i></a>
+                    <label
+                        style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; font-size: 0.85rem; font-weight: 600; color: var(--text-muted); cursor: pointer; margin-top: 0.5rem;">
+                        <input type="checkbox" class="compare-cb" value="{{ rec.name }}" data-price="{{ rec.price }}"
+                            data-source="{{ rec.source }}" data-image="{{ rec.image }}" data-url="{{ rec.url }}"
+                            onchange="handleCompareChange(this)" onclick="event.stopPropagation()"
+                            style="width: 18px; height: 18px; cursor: pointer; accent-color: var(--primary);">
+                        Select to Compare
+                    </label>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+<!-- Price Trend Modal -->
+<div id="trendModal" class="modal">
+    <div class="modal-content">
+        <span
+            style="position: absolute; top: 1.5rem; right: 2rem; font-size: 2rem; cursor: pointer; color: var(--text-muted);"
+            onclick="closeModal()">&times;</span>
+        <h2 id="modalTitle" style="margin-bottom: 2rem; color: var(--text-main);">Price Analytics</h2>
+        <div style="height: 400px; width: 100%;">
+            <canvas id="trendChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<!-- Price Alert Modal -->
+<div id="alertModal" class="modal" style="z-index: 2100;">
+    <div class="modal-content" style="max-width: 480px; padding: 2.5rem;">
+        <span
+            style="position: absolute; top: 1.5rem; right: 2rem; font-size: 2rem; cursor: pointer; color: var(--text-muted);"
+            onclick="closeAlertModal()">&times;</span>
+        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem;">
+            <div
+                style="width: 3rem; height: 3rem; background: linear-gradient(135deg, #fbbf24, #f59e0b); border-radius: 0.75rem; display: flex; align-items: center; justify-content: center; font-size: 1.25rem;">
+                🔔</div>
+            <div>
+                <h2 style="font-size: 1.25rem; color: var(--text-main);">Set Price Alert</h2>
+                <p style="color: var(--text-muted); font-size: 0.85rem;">We'll email you when the price drops</p>
+            </div>
+        </div>
+
+        <p id="alertProductName"
+            style="font-weight: 700; color: var(--primary); margin-bottom: 0.5rem; font-size: 0.9rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+        </p>
+        <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1.5rem;">
+            Current price: <strong id="alertCurrentPrice" style="color: var(--text-main);"></strong>
+        </p>
+
+        <form id="alertForm" onsubmit="submitAlert(event)">
+            <input type="hidden" id="alertNameInput">
+            <input type="hidden" id="alertSourceInput">
+            <input type="hidden" id="alertUrlInput">
+            <input type="hidden" id="alertImageInput">
+            <input type="hidden" id="alertCurrentPriceInput">
+
+            <label
+                style="display: block; font-size: 0.85rem; font-weight: 700; color: var(--text-muted); margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.05em;">Your
+                Target Price (Rs.)</label>
+            <input type="number" id="alertTargetPrice" placeholder="e.g. 5000"
+                style="width: 100%; padding: 0.85rem 1.25rem; border: 2px solid var(--border); border-radius: 0.75rem; background: var(--bg-body); color: var(--text-main); font-size: 1.1rem; font-weight: 700; outline: none; margin-bottom: 1.5rem; transition: border-color 0.2s;"
+                onfocus="this.style.borderColor='#fbbf24'" onblur="this.style.borderColor='var(--border)'" required
+                min="1">
+
+            <button type="submit" id="alertSubmitBtn"
+                style="width: 100%; padding: 0.85rem; background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #1e293b; font-weight: 800; border: none; border-radius: 0.75rem; cursor: pointer; font-size: 1rem; transition: all 0.2s;">
+                🔔 Activate Alert
+            </button>
+        </form>
+
+        <div id="alertFeedback"
+            style="display: none; margin-top: 1rem; padding: 1rem; border-radius: 0.75rem; font-weight: 600; font-size: 0.9rem;">
+        </div>
+    </div>
+</div>
+
+<!-- Side-by-Side Comparison Modal -->
+<div id="compareModal" class="modal">
+    <div class="modal-content" style="max-width: 1200px; padding: 2.5rem; overflow-x: auto;">
+        <span
+            style="position: absolute; top: 1.5rem; right: 2rem; font-size: 2rem; cursor: pointer; color: var(--text-muted);"
+            onclick="closeCompareModal()">&times;</span>
+        <h2 style="margin-bottom: 1.5rem; color: var(--text-main);"><i class="fas fa-balance-scale"
+                style="color: var(--primary); margin-right: 0.75rem;"></i> Compare Products</h2>
+        <div id="compareTableContainer" style="overflow-x: auto;">
+            <!-- Table gets generated by JS -->
+        </div>
+    </div>
+</div>
+
+<!-- Trust Score Modal -->
+<div id="trustModal" class="modal">
+    <div class="modal-content" style="max-width: 600px; text-align: center;">
+        <span
+            style="position: absolute; top: 1.5rem; right: 2rem; font-size: 2rem; cursor: pointer; color: var(--text-muted);"
+            onclick="closeTrustModal()">&times;</span>
+        <h2 style="margin-bottom: 0.5rem; color: var(--text-main);"><i class="fas fa-shield-alt"
+                style="color: #10b981; margin-right: 0.75rem;"></i> AI Trust Analysis</h2>
+        <p id="trustProductData" style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 2rem;"></p>
+
+        <div id="trustLoader" style="display: none; margin: 3rem 0;">
+            <div class="loader" style="width: 40px; height: 40px; margin: 0 auto;"></div>
+            <p style="margin-top: 1rem; color: var(--text-muted);">Analyzing reviews and reputation via NLP...</p>
+        </div>
+
+        <div id="trustResults" style="display: none;">
+            <div style="font-size: 4rem; font-weight: 900; color: #10b981; line-height: 1;" id="trustScoreCircle">0%
+            </div>
+            <div style="font-size: 1.25rem; font-weight: 700; color: var(--text-main); margin-bottom: 2rem;">Ratings
+            </div>
+
+            <div
+                style="text-align: left; background: var(--bg-body); padding: 1.5rem; border-radius: 1rem; margin-bottom: 1.5rem;">
+                <h4 style="margin-bottom: 1rem; color: var(--text-main);">Sentiment Breakdown</h4>
+
+                <div style="display: flex; align-items: center; margin-bottom: 0.75rem;">
+                    <span style="width: 80px; font-weight: 600; color: #10b981;">Positive</span>
+                    <div
+                        style="flex: 1; background: var(--border); height: 8px; border-radius: 4px; overflow: hidden; margin-right: 1rem;">
+                        <div id="barPos" style="height: 100%; background: #10b981; width: 0%;"></div>
+                    </div>
+                    <span id="pctPos" style="font-weight: 600; width: 40px; text-align: right;">0%</span>
+                </div>
+
+                <div style="display: flex; align-items: center; margin-bottom: 0.75rem;">
+                    <span style="width: 80px; font-weight: 600; color: #f59e0b;">Neutral</span>
+                    <div
+                        style="flex: 1; background: var(--border); height: 8px; border-radius: 4px; overflow: hidden; margin-right: 1rem;">
+                        <div id="barNeu" style="height: 100%; background: #f59e0b; width: 0%;"></div>
+                    </div>
+                    <span id="pctNeu" style="font-weight: 600; width: 40px; text-align: right;">0%</span>
+                </div>
+
+                <div style="display: flex; align-items: center;">
+                    <span style="width: 80px; font-weight: 600; color: #ef4444;">Negative</span>
+                    <div
+                        style="flex: 1; background: var(--border); height: 8px; border-radius: 4px; overflow: hidden; margin-right: 1rem;">
+                        <div id="barNeg" style="height: 100%; background: #ef4444; width: 0%;"></div>
+                    </div>
+                    <span id="pctNeg" style="font-weight: 600; width: 40px; text-align: right;">0%</span>
+                </div>
+            </div>
+
+            <p id="trustMethodResult" style="font-size: 0.8rem; color: var(--text-muted);"></p>
+        </div>
+    </div>
+</div>
+
+
+<!-- QR Code Modal -->
+<div id="qrModal" class="modal" style="z-index: 3000;">
+    <div class="modal-content" style="max-width: 400px; text-align: center; padding: 2.5rem;">
+        <span
+            style="position: absolute; top: 1.5rem; right: 2rem; font-size: 2rem; cursor: pointer; color: var(--text-muted);"
+            onclick="closeQRModal()">&times;</span>
+        <h2 style="margin-bottom: 1.5rem; color: var(--text-main);"><i class="fas fa-qrcode"
+                style="color: #3b82f6; margin-right: 0.75rem;"></i> Scan to Mobile</h2>
+        <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 2rem;">Scan this QR code with your mobile
+            phone to view the exact deal.</p>
+        <div id="qrCodeContainer"
+            style="display: flex; justify-content: center; align-items: center; background: white; padding: 1.5rem; border-radius: 1rem; border: 2px solid var(--border); margin: 0 auto; width: fit-content;">
+            <img id="qrCodeImage" src="" alt="QR Code" style="width: 200px; height: 200px;">
+        </div>
+    </div>
+</div>
+
+<!-- Floating Compare Bar -->
+<div id="compareBar" class="compare-bar">
+    <div>
+        <span id="compareCount" style="font-weight: 800; color: var(--primary); font-size: 1.25rem;">0</span>
+        <span style="color: var(--text-muted); font-weight: 600; margin-left: 0.5rem;">products selected</span>
+    </div>
+    <div style="display: flex; gap: 1rem;">
+        <button class="btn-outline" onclick="clearComparison()">Clear All</button>
+        <button class="btn-primary" onclick="openCompareModal()">Compare Now</button>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // AI Authentication State
+    const isLoggedIn = document.body.getAttribute('data-user-authenticated') === 'true';
+
+    function handleWishlistSubmit(event, form) {
+        if (!isLoggedIn) {
+            event.preventDefault();
+            if (confirm("Sign in is required to save to wishlist. Would you like to go to the Sign In page?")) {
+                window.location.href = "{{ url_for('signin') }}";
+            }
+            return false;
+        }
+        return true;
+    }
+
+    // AI Smart Search Suggestions Logic
+    function initAutocomplete(inputId, boxId, formId) {
+        const input = document.getElementById(inputId);
+        const box = document.getElementById(boxId);
+        const form = document.getElementById(formId);
+        let debounceTimer;
+
+        if (!input || !box) return;
+
+        input.addEventListener('input', function () {
+            clearTimeout(debounceTimer);
+            const query = this.value.trim();
+
+            if (query.length < 1) {
+                box.style.display = 'none';
+                return;
+            }
+
+            debounceTimer = setTimeout(() => {
+                fetch(`/api/suggestions?q=${encodeURIComponent(query)}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.suggestions && data.suggestions.length > 0) {
+                            box.innerHTML = '';
+                            data.suggestions.forEach(suggestion => {
+                                const div = document.createElement('div');
+                                div.className = 'suggestion-item';
+                                const regex = new RegExp(`(${query})`, 'gi');
+                                const highlighted = suggestion.replace(regex, '<strong>$1</strong>');
+                                div.innerHTML = `<i class="fas fa-search" style="color: var(--text-muted); font-size: 0.8rem;"></i> <span>${highlighted}</span>`;
+                                div.onclick = function () {
+                                    input.value = suggestion;
+                                    box.style.display = 'none';
+                                    if (form) {
+                                        if (typeof showLoading === 'function') showLoading();
+                                        form.submit();
+                                    }
+                                };
+                                box.appendChild(div);
+                            });
+                            box.style.display = 'block';
+                        } else {
+                            box.style.display = 'none';
+                        }
+                    })
+                    .catch(err => console.error("Error fetching suggestions:", err));
+            }, 300);
+        });
+
+        // Close suggestions if clicking outside
+        document.addEventListener('click', function (e) {
+            if (!input.contains(e.target) && !box.contains(e.target)) {
+                box.style.display = 'none';
+            }
+        });
+    }
+
+    function showLoading() {
+        document.getElementById('productResults').style.display = 'none';
+        document.getElementById('loadingIndicator').style.display = 'block';
+    }
+
+    let trendChart = null;
+
+    function showTrends(btn) {
+        const name = btn.getAttribute('data-product');
+        const source = btn.getAttribute('data-source');
+        const price = btn.getAttribute('data-price') || 0;
+
+        document.getElementById('trendModal').style.display = 'block';
+        document.getElementById('modalTitle').innerText = 'Price Trend: ' + name;
+
+        // Reset chart area
+        const chartContainer = document.getElementById('trendChart').parentElement;
+        chartContainer.innerHTML = '<canvas id="trendChart"></canvas>';
+        const ctx = document.getElementById('trendChart').getContext('2d');
+
+        fetch(`/api/price_history?name=${encodeURIComponent(name)}&source=${encodeURIComponent(source)}&price=${price}`)
+            .then(response => response.json())
+            .then(data => {
+                console.log("Trend Data:", data);
+                if (!data.data || data.data.length === 0) {
+                    alert("No price history available for this specific product version yet.");
+                    closeModal();
+                    return;
+                }
+
+                if (typeof Chart === 'undefined') {
+                    console.error("Chart.js not loaded!");
+                    alert("Chart engine is loading. Please wait a second and try again.");
+                    return;
+                }
+
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.labels,
+                        datasets: [{
+                            label: 'Price (PKR)',
+                            data: data.data.map(val => parseFloat(val)),
+                            borderColor: '#e67e22',
+                            backgroundColor: 'rgba(230, 126, 34, 0.1)',
+                            fill: true,
+                            tension: 0.3,
+                            pointRadius: 5,
+                            pointHoverRadius: 8,
+                            pointBackgroundColor: '#fff',
+                            pointBorderWidth: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        interaction: {
+                            intersect: false,
+                            mode: 'index',
+                        },
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                padding: 12,
+                                bodyFont: { size: 14 }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: false,
+                                grid: { color: 'rgba(0,0,0,0.05)' },
+                                ticks: {
+                                    callback: function (value) {
+                                        return 'Rs. ' + Math.round(value).toLocaleString();
+                                    }
+                                }
+                            },
+                            x: {
+                                grid: { display: false }
+                            }
+                        }
+                    }
+                });
+            })
+            .catch(err => {
+                console.error("Trend Fetch Error:", err);
+                alert("Error loading trend data.");
+            });
+    }
+
+    function closeModal() {
+        document.getElementById('trendModal').style.display = 'none';
+    }
+
+    window.onclick = function (event) {
+        if (event.target == document.getElementById('trendModal')) {
+            closeModal();
+        }
+        if (event.target == document.getElementById('compareModal')) {
+            closeCompareModal();
+        }
+        if (event.target == document.getElementById('qrModal')) {
+            closeQRModal();
+        }
+    }
+
+    function showQRCode(btn) {
+        const url = btn.getAttribute('data-url');
+        if (!url || url === '#') {
+            alert('No valid URL available for this product.');
+            return;
+        }
+        document.getElementById('qrCodeImage').src = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(url)}`;
+        document.getElementById('qrModal').style.display = 'flex';
+    }
+
+    function closeQRModal() {
+        document.getElementById('qrModal').style.display = 'none';
+        document.getElementById('qrCodeImage').src = '';
+    }
+
+    // --- Side-by-Side Comparison Logic ---
+    let compareList = [];
+
+    function handleCompareChange(cb) {
+        let rawPrice = cb.getAttribute('data-price') || '0';
+        let cleanPriceVal = parseFloat(rawPrice.toString().replace(/,/g, '')) || 0;
+
+        const item = {
+            name: cb.value,
+            price: cleanPriceVal,
+            source: cb.getAttribute('data-source') || 'Unknown',
+            image: cb.getAttribute('data-image') || '',
+            url: cb.getAttribute('data-url') || '#'
+        };
+
+        if (cb.checked) {
+            if (compareList.length >= 4) {
+                alert("Maximum 4 products allowed for comparison.");
+                cb.checked = false;
+                return;
+            }
+            if (!compareList.find(i => i.name === item.name && i.source === item.source)) {
+                compareList.push(item);
+            }
+        } else {
+            compareList = compareList.filter(p => !(p.name === item.name && p.source === item.source));
+        }
+
+        // Update count display
+        const countDisplay = document.getElementById('compareCount');
+        if (countDisplay) countDisplay.innerText = compareList.length;
+
+        // Show/hide bar
+        const bar = document.getElementById('compareBar');
+        if (bar) bar.style.display = compareList.length > 0 ? 'flex' : 'none';
+    }
+
+    function updateCompareBar() {
+        const bar = document.getElementById('compareBar');
+        const countDisplay = document.getElementById('compareCount');
+        if (!bar) return;
+        if (countDisplay) countDisplay.innerText = compareList.length;
+        bar.style.display = compareList.length > 0 ? 'flex' : 'none';
+    }
+
+    function clearComparison() {
+        compareList = [];
+        document.querySelectorAll('.compare-cb').forEach(cb => cb.checked = false);
+        updateCompareBar();
+    }
+
+    function openCompareModal() {
+        if (compareList.length < 2) {
+            alert("Please select at least 2 products to compare.");
+            return;
+        }
+
+        console.log("Opening Compare Modal with", compareList.length, "items");
+
+        // Helper to escape for HTML table content
+        const escapeHtml = (str) => {
+            if (!str) return "";
+            return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+        };
+
+        // Find lowest price index
+        let lowestPrice = Infinity;
+        let lowestIndex = -1;
+        compareList.forEach((p, idx) => {
+            if (p.price < lowestPrice) {
+                lowestPrice = p.price;
+                lowestIndex = idx;
+            }
+        });
+
+        let tableHtml = '<table class="compare-table">';
+
+        // Row 1: Images
+        tableHtml += '<tr><th>Visual</th>';
+        compareList.forEach((p, idx) => {
+            const highlight = (idx === lowestIndex) ? 'border: 3px solid #10b981; box-shadow: 0 0 15px rgba(16, 185, 129, 0.3);' : '';
+            tableHtml += `<td style="text-align: center; position: relative;">
+                ${idx === lowestIndex ? '<span style="position: absolute; top: 0; left: 50%; transform: translateX(-50%); background: #10b981; color: white; padding: 2px 8px; font-size: 0.7rem; border-radius: 4px; font-weight: 800; z-index: 10;">BEST VALUE</span>' : ''}
+                <img src="${escapeHtml(p.image)}" alt="Product" style="max-height: 120px; transition: all 0.3s; ${highlight}" onerror="this.src='https://via.placeholder.com/100?text=No+Image'">
+            </td>`;
+        });
+        tableHtml += '</tr>';
+
+        // Row 2: Name
+        tableHtml += '<tr><th>Product</th>';
+        compareList.forEach(p => {
+            const shortName = p.name.length > 50 ? p.name.substring(0, 47) + '...' : p.name;
+            tableHtml += `<td style="font-weight: 600; color: var(--text-main); font-size: 0.9rem;">${escapeHtml(shortName)}</td>`;
+        });
+        tableHtml += '</tr>';
+
+        // Row 3: Price
+        tableHtml += '<tr><th>Price</th>';
+        compareList.forEach((p, idx) => {
+            const color = (idx === lowestIndex) ? '#10b981' : 'var(--primary)';
+            tableHtml += `<td>
+                <div style="font-size: 1.35rem; font-weight: 800; color: ${color};">Rs. ${parseInt(p.price).toLocaleString()}</div>
+                ${idx === lowestIndex ? '<div style="font-size: 0.7rem; color: #10b981; font-weight: 700;">LOWEST PRICE FOUND</div>' : ''}
+            </td>`;
+        });
+        tableHtml += '</tr>';
+
+        // Row 4: Source
+        tableHtml += '<tr><th>Store</th>';
+        compareList.forEach(p => {
+            tableHtml += `<td><span style="background: var(--bg-body); padding: 0.4rem 0.8rem; border-radius: 2rem; font-weight: 700; font-size: 0.75rem; border: 1px solid var(--border);">${escapeHtml(p.source)}</span></td>`;
+        });
+        tableHtml += '</tr>';
+
+        // Row 5: Action
+        tableHtml += '<tr><th>Action</th>';
+        compareList.forEach(p => {
+            tableHtml += `<td><a href="${escapeHtml(p.url)}" target="_blank" class="btn-view-deal" style="padding: 0.7rem 1.5rem; font-size: 0.85rem; border-radius: 9999px;">View Offer</a></td>`;
+        });
+        tableHtml += '</tr>';
+
+        tableHtml += '</table>';
+
+        document.getElementById('compareTableContainer').innerHTML = tableHtml;
+        document.getElementById('compareModal').style.display = 'flex';
+    }
+
+    function closeCompareModal() {
+        document.getElementById('compareModal').style.display = 'none';
+    }
+
+    // --- NLP Trust Score Logic ---
+    function analyzeTrust(btn) {
+        const name = btn.getAttribute('data-product');
+        const source = btn.getAttribute('data-source');
+        const url = btn.getAttribute('data-url');
+        const price = btn.getAttribute('data-price');
+        const rating = btn.getAttribute('data-rating') || '';
+        const reviews = btn.getAttribute('data-reviews') || '';
+
+        document.getElementById('trustModal').style.display = 'flex';
+        document.getElementById('trustProductData').innerText = `${name} | ${source}`;
+
+        document.getElementById('trustResults').style.display = 'none';
+        document.getElementById('trustLoader').style.display = 'block';
+
+        const apiUrl = `/api/analyze_trust?name=${encodeURIComponent(name)}&source=${encodeURIComponent(source)}&url=${encodeURIComponent(url)}&price=${encodeURIComponent(price)}&rating=${encodeURIComponent(rating)}&reviews=${encodeURIComponent(reviews)}`;
+
+        fetch(apiUrl)
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById('trustLoader').style.display = 'none';
+                document.getElementById('trustResults').style.display = 'block';
+
+                const scoreCircle = document.getElementById('trustScoreCircle');
+                scoreCircle.innerText = data.trust_score + '%';
+
+                // Color code score
+                if (data.trust_score >= 80) scoreCircle.style.color = '#10b981';
+                else if (data.trust_score >= 50) scoreCircle.style.color = '#f59e0b';
+                else scoreCircle.style.color = '#ef4444';
+
+                document.getElementById('barPos').style.width = data.positive_pct + '%';
+                document.getElementById('pctPos').innerText = data.positive_pct + '%';
+
+                document.getElementById('barNeu').style.width = data.neutral_pct + '%';
+                document.getElementById('pctNeu').innerText = data.neutral_pct + '%';
+
+                document.getElementById('barNeg').style.width = data.negative_pct + '%';
+                document.getElementById('pctNeg').innerText = data.negative_pct + '%';
+
+                document.getElementById('trustMethodResult').innerText = `Analysis Method: ${data.method} | Analyzed Text Length: ${data.analyzed_text_length} chars`;
+            })
+            .catch(err => {
+                console.error(err);
+                document.getElementById('trustLoader').style.display = 'none';
+                document.getElementById('trustProductData').innerText = "Failed to analyze product. Please try again.";
+            });
+    }
+
+    function closeTrustModal() {
+        document.getElementById('trustModal').style.display = 'none';
+    }
+
+    // --- Price Alert Modal ---
+    function openAlertModal(name, price, source, url, image) {
+        document.getElementById('alertModal').style.display = 'flex';
+        document.getElementById('alertProductName').innerText = name;
+        document.getElementById('alertCurrentPrice').innerText = `Rs. ${parseInt(price).toLocaleString()}`;
+        document.getElementById('alertNameInput').value = name;
+        document.getElementById('alertSourceInput').value = source;
+        document.getElementById('alertUrlInput').value = url;
+        document.getElementById('alertImageInput').value = image;
+        document.getElementById('alertCurrentPriceInput').value = price;
+        document.getElementById('alertTargetPrice').value = '';
+        document.getElementById('alertFeedback').style.display = 'none';
+    }
+
+    function closeAlertModal() {
+        document.getElementById('alertModal').style.display = 'none';
+    }
+
+    function submitAlert(event) {
+        event.preventDefault();
+        const btn = document.getElementById('alertSubmitBtn');
+        btn.innerText = 'Setting Alert...';
+        btn.disabled = true;
+
+        const formData = new FormData();
+        formData.append('product_name', document.getElementById('alertNameInput').value);
+        formData.append('target_price', document.getElementById('alertTargetPrice').value);
+        formData.append('source', document.getElementById('alertSourceInput').value);
+        formData.append('url', document.getElementById('alertUrlInput').value);
+        formData.append('image', document.getElementById('alertImageInput').value);
+        formData.append('current_price', document.getElementById('alertCurrentPriceInput').value);
+
+        fetch('/set_alert', { method: 'POST', body: formData })
+            .then(res => res.json())
+            .then(data => {
+                const fb = document.getElementById('alertFeedback');
+                fb.style.display = 'block';
+                if (data.status === 'success') {
+                    fb.style.background = 'rgba(16,185,129,0.1)';
+                    fb.style.border = '1px solid #10b981';
+                    fb.style.color = '#10b981';
+                    fb.innerText = '✅ ' + data.message;
+                    btn.innerText = '✅ Alert Set!';
+                    setTimeout(() => closeAlertModal(), 2500);
+                } else {
+                    fb.style.background = 'rgba(239,68,68,0.1)';
+                    fb.style.border = '1px solid #ef4444';
+                    fb.style.color = '#ef4444';
+                    fb.innerText = '❌ ' + data.message;
+                    btn.innerText = '🔔 Activate Alert';
+                    btn.disabled = false;
+                }
+            })
+            .catch(() => {
+                btn.innerText = '🔔 Activate Alert';
+                btn.disabled = false;
+            });
+    }
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    // --- Infinite Scroll & Filtering Logic ---
+    let allProducts = [];
+    let filteredProducts = [];
+    let displayedCount = 0;
+    const CHUNK_SIZE = 12;
+
+    const currentQuery = "{{ query | default('') | escape }}";
+    const enabledSources = JSON.parse('{{ sources_enabled | tojson | safe if sources_enabled else "[]" }}');
+
+    function recalculateBestDeal() {
+        allProducts.forEach(p => p.best = false);
+        let lowestPrice = Infinity;
+        let bestProduct = null;
+        allProducts.forEach(p => {
+            const price = parseFloat(p.price) || 0;
+            if (price > 0 && price < lowestPrice) {
+                lowestPrice = price;
+                bestProduct = p;
+            }
+        });
+        if (bestProduct) {
+            bestProduct.best = true;
+        }
+    }
+
+    function cacheResultsOnServer() {
+        fetch('/api/cache_results', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                query: currentQuery,
+                products: allProducts
+            })
+        })
+            .then(res => res.json())
+            .then(data => console.log("Cached results on server:", data))
+            .catch(err => console.error("Error caching results:", err));
+    }
+
+    function handleSortChange() {
+        const val = document.getElementById('sortSelect') ? document.getElementById('sortSelect').value : 'low';
+        if (val === "high") {
+            allProducts.sort((a, b) => b.price - a.price);
+        } else if (val === "trust") {
+            allProducts.sort((a, b) => (b.trust_score || 0) - (a.trust_score || 0));
+        } else if (val === "rating") {
+            allProducts.sort((a, b) => (parseFloat(b.rating) || 0) - (parseFloat(a.rating) || 0));
+        } else {
+            allProducts.sort((a, b) => a.price - b.price);
+        }
+        applyFilters();
+    }
+
+    function triggerProgressiveLoading() {
+        if (!currentQuery || enabledSources.length === 0) return;
+
+        const statusList = document.getElementById('statusList');
+        if (!statusList) return;
+        statusList.innerHTML = '';
+
+        enabledSources.forEach(source => {
+            const div = document.createElement('div');
+            div.id = `status-${source}`;
+            div.style.display = 'flex';
+            div.style.alignItems = 'center';
+            div.style.gap = '0.5rem';
+            div.style.fontWeight = '600';
+            div.style.fontSize = '0.9rem';
+            div.style.color = 'var(--text-muted)';
+            div.innerHTML = `<i class="fas fa-circle-notch fa-spin" style="color: var(--primary);"></i> ${source.charAt(0).toUpperCase() + source.slice(1)}`;
+            statusList.appendChild(div);
+        });
+
+        let activeDownloads = enabledSources.length;
+
+        enabledSources.forEach(source => {
+            fetch(`/api/scrape_source?q=${encodeURIComponent(currentQuery)}&source=${source}`)
+                .then(res => res.json())
+                .then(data => {
+                    const statusDiv = document.getElementById(`status-${source}`);
+                    if (data.success && data.products && data.products.length > 0) {
+                        allProducts = allProducts.concat(data.products);
+                        const cleanSource = source.charAt(0).toUpperCase() + source.slice(1);
+                        if (statusDiv) {
+                            statusDiv.innerHTML = `<i class="fas fa-check-circle" style="color: #10b981;"></i> ${cleanSource} (${data.products.length})`;
+                            statusDiv.style.color = 'var(--text-main)';
+                        }
+                    } else {
+                        const cleanSource = source.charAt(0).toUpperCase() + source.slice(1);
+                        if (statusDiv) {
+                            statusDiv.innerHTML = `<i class="fas fa-exclamation-circle" style="color: #ef4444;"></i> ${cleanSource} (0)`;
+                        }
+                    }
+                })
+                .catch(err => {
+                    console.error(`Error loading source ${source}:`, err);
+                    const statusDiv = document.getElementById(`status-${source}`);
+                    const cleanSource = source.charAt(0).toUpperCase() + source.slice(1);
+                    if (statusDiv) {
+                        statusDiv.innerHTML = `<i class="fas fa-exclamation-circle" style="color: #ef4444;"></i> ${cleanSource} (Error)`;
+                    }
+                })
+                .finally(() => {
+                    activeDownloads--;
+
+                    recalculateBestDeal();
+                    handleSortChange();
+
+                    if (allProducts.length > 0) {
+                        const expBtn = document.getElementById('exportCsvBtn');
+                        if (expBtn) expBtn.style.display = 'inline-block';
+                    }
+
+                    populateStoreFilters();
+
+                    if (activeDownloads === 0) {
+                        const loader = document.getElementById('loadingIndicator');
+                        if (loader) loader.style.display = 'none';
+
+                        const masterIcon = document.getElementById('statusMasterIcon');
+                        if (masterIcon) {
+                            masterIcon.className = 'fas fa-check-double';
+                            masterIcon.style.color = '#10b981';
+                        }
+
+                        const masterText = document.getElementById('statusMasterText');
+                        if (masterText) masterText.innerText = 'Search Complete';
+
+                        cacheResultsOnServer();
+
+                        if (allProducts.length === 0) {
+                            document.getElementById('noResults').style.display = 'block';
+                            document.getElementById('scrollAnchor').style.display = 'none';
+                        }
+                    }
+                });
+        });
+    }
+
+    // Initialize products from server-side data
+    try {
+        const dataEl = document.getElementById('productsData');
+        if (dataEl) {
+            allProducts = JSON.parse(dataEl.getAttribute('data-products')) || [];
+        } else {
+            allProducts = [];
+        }
+        filteredProducts = [...allProducts];
+    } catch (e) {
+        console.error("Error parsing product data:", e);
+        allProducts = [];
+        filteredProducts = [];
+    }
+
+    function renderProductCard(product) {
+        // Use proxy for relevant sources to bypass CORS or Referer blocks
+        // We include Daraz as it frequently blocks direct hotlinking from local/different domains
+        const source = product.source ? product.source.toLowerCase() : '';
+        const needsProxy = ['shophive', 'ubuy', 'amazon', 'daraz', 'clicky.pk', 'telemart', 'priceoye', 'al-fatah'].includes(source);
+        const redirectUrl = `/redirect_store?url=${encodeURIComponent(product.url || '#')}&amp;store=${encodeURIComponent(product.source || 'Unknown')}&amp;title=${encodeURIComponent(product.name || '')}&amp;price=${product.price || 0}`;
+
+        // Ensure image URL is valid and absolute
+        let imgUrl = product.image || 'https://via.placeholder.com/200?text=No+Image';
+        if (imgUrl.startsWith('//')) imgUrl = 'https:' + imgUrl;
+
+        const proxyUrl = (needsProxy && !imgUrl.startsWith('/static'))
+            ? `/api/proxy_image?url=${encodeURIComponent(imgUrl)}`
+            : imgUrl;
+
+        const bestDealBadge = product.best ? `<div class="deal-badge"><i class="fas fa-fire"></i> Best Deal</div>` : '';
+
+        const priceVal = parseFloat(product.price) || 0;
+        const priceDisplay = (product.price_text && product.price_text.includes('Rs'))
+            ? product.price_text
+            : `Rs. ${priceVal.toLocaleString()}`;
+
+        const trendTag = product.trend ? `
+            <span class="trend-tag ${product.trend < 0 ? 'trend-down' : 'trend-up'}">
+                <i class="fas fa-arrow-${product.trend < 0 ? 'down' : 'up'}"></i>
+                ${Math.abs(product.trend)}%
+            </span>
+        ` : '';
+
+        const trustScore = product.trust_score || 0;
+        const trustLevel = product.trust_level || 'Low';
+        const trustClass = trustLevel.toLowerCase();
+
+        const trustBadge = `
+            <div class="trust-badge-direct" title="Trust Score: ${trustScore}%">
+                <div class="trust-score-circle trust-${trustClass}">
+                    ${trustScore}
+                </div>
+                <div class="trust-label ${trustClass}">${trustLevel} Trust</div>
+            </div>
+        `;
+
+        const trustBar = `
+            <div style="margin-top: 0.5rem; width: 100%;">
+                <div class="trust-bar-container">
+                    <div class="trust-bar-fill trust-${trustClass}" style="width: ${trustScore}%; background: ${trustClass === 'high' ? '#10b981' : trustClass === 'medium' ? '#f59e0b' : '#ef4444'};"></div>
+                </div>
+            </div>
+        `;
+
+        return `
+            <div class="product-card">
+                ${bestDealBadge}
+                ${trustBadge}
+                <a href="${redirectUrl}" target="_blank" style="text-decoration: none; display: block;">
+                    <div class="img-container">
+                        <img src="${proxyUrl}" 
+                             onerror="this.onerror=null; this.src='https://via.placeholder.com/200?text=Image+Not+Found';"
+                             alt="${product.name}">
+                    </div>
+                </a>
+                <div class="wishlist-container">
+                    <form action="/add_to_wishlist" method="POST" onsubmit="return handleWishlistSubmit(event, this)">
+                        <input type="hidden" name="name" value="${product.name}">
+                        <input type="hidden" name="price" value="${product.price}">
+                        <input type="hidden" name="image" value="${product.image}">
+                        <input type="hidden" name="url" value="${product.url || '#'}">
+                        <input type="hidden" name="source" value="${product.source}">
+                        <button type="submit" class="btn-wishlist" title="Add to Wishlist">
+                            <i class="fas fa-heart"></i>
+                        </button>
+                    </form>
+                </div>
+                <div class="card-body">
+                    <div class="card-source">${product.source || 'Marketplace'}</div>
+                    <a href="${redirectUrl}" target="_blank" style="text-decoration: none;">
+                        <div class="card-title">${product.name}</div>
+                    </a>
+                    <div class="card-price">
+                        <span>${priceDisplay}</span>
+                        ${trendTag}
+                    </div>
+                    ${trustBar}
+                    <div class="card-actions">
+                        <div style="display: flex; flex-direction: column; gap: 0.75rem; width: 100%;">
+                            <div style="display: flex; gap: 0.5rem; width: 100%;">
+                                <button class="btn-outline" data-product="${product.name}" data-source="${product.source}" data-price="${product.price}" onclick="showTrends(this)" style="flex: 1; padding: 0.6rem; font-size: 0.85rem; border-radius: 0.6rem;">
+                                    <i class="fas fa-chart-line"></i> Trends
+                                </button>
+                                <button class="btn-outline" data-product="${product.name}" data-source="${product.source}" data-price="${product.price}" data-url="${product.url || '#'}" onclick="analyzeTrust(this)" style="flex: 1; padding: 0.6rem; font-size: 0.85rem; border-radius: 0.6rem; border-color: #10b981; color: #10b981;">
+                                    Trust Score
+                                </button>
+                            </div>
+                            <!-- QR Code button moved to secondary to keep UI clean like screenshot -->
+                            <button class="btn-outline" data-url="${product.url || '#'}" onclick="showQRCode(this)" style="width: 100%; padding: 0.4rem; font-size: 0.7rem; border-radius: 0.6rem; border-color: #3b82f6; color: #3b82f6; opacity: 0.7;">
+                                <i class="fas fa-qrcode"></i> Scan QR
+                            </button>
+                            <a href="${redirectUrl}" target="_blank" class="btn-view-deal">
+                                View Product <i class="fas fa-external-link-alt" style="margin-left: 0.5rem; font-size: 0.7rem;"></i>
+                            </a>
+                            <label style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; font-size: 0.85rem; font-weight: 600; color: var(--text-muted); cursor: pointer; margin-top: 0.25rem;">
+                                <input type="checkbox" class="compare-cb" 
+                                    value="${product.name.replace(/"/g, '&quot;')}" 
+                                    data-price="${product.price}" 
+                                    data-source="${product.source}" 
+                                    data-image="${(product.image || '').replace(/"/g, '&quot;')}" 
+                                    data-url="${(product.url || '#').replace(/"/g, '&quot;')}" 
+                                    onchange="event.stopPropagation(); handleCompareChange(this)" 
+                                    onclick="event.stopPropagation()"
+                                    style="width: 18px; height: 18px; cursor: pointer; accent-color: var(--primary);">
+                                Select to Compare
+                            </label>
+                            ${isLoggedIn ? `
+                            <button onclick="openAlertModal('${product.name.replace(/'/g, '&apos;')}', ${product.price}, '${product.source}', '${(product.url || '').replace(/'/g, '')}', '${(product.image || '').replace(/'/g, '')}')"
+                                style="background: rgba(251,191,36,0.1); border: 1px solid #fbbf24; color: #fbbf24; padding: 0.5rem 1rem; border-radius: 0.75rem; font-size: 0.8rem; font-weight: 700; cursor: pointer; width: 100%; transition: all 0.2s ease;" 
+                                onmouseover="this.style.background='rgba(251,191,36,0.2)'" onmouseout="this.style.background='rgba(251,191,36,0.1)'">
+                                🔔 Set Price Alert
+                            </button>
+                            ` : ''}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    function loadMoreProducts() {
+        renderStoreSections();
+    }
+
+    function renderStoreSections() {
+        const container = document.getElementById('productResults');
+        if (!container) return;
+
+        if (filteredProducts.length === 0) {
+            document.getElementById('noResults').style.display = 'block';
+            container.style.display = 'none';
+            return;
+        }
+
+        document.getElementById('noResults').style.display = 'none';
+        container.style.display = 'grid';
+        container.innerHTML = '';
+
+        // Group products by store / source in sequential order of loading
+        const storeGroups = {};
+        const storeOrder = [];
+        filteredProducts.forEach(product => {
+            const store = product.source || 'Marketplace';
+            if (!storeGroups[store]) {
+                storeGroups[store] = [];
+                storeOrder.push(store);
+            }
+            storeGroups[store].push(product);
+        });
+
+        // Render each website's products sequentially (Website 1, then Website 2 below it, Website 3 below it, etc.)
+        storeOrder.forEach(store => {
+            const products = storeGroups[store];
+            products.forEach(product => {
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = renderProductCard(product).trim();
+                container.appendChild(tempDiv.firstChild);
+            });
+        });
+
+        // Re-sync any checked comparison checkboxes in the rendered DOM
+        document.querySelectorAll('.compare-cb').forEach(cb => {
+            const isChecked = compareList.some(i => i.name === cb.value && i.source === cb.getAttribute('data-source'));
+            cb.checked = isChecked;
+        });
+
+        const anchor = document.getElementById('scrollAnchor');
+        if (anchor) anchor.style.display = 'none';
+    }
+
+    function applyFilters() {
+        const minPrice = parseFloat(document.getElementById('minPrice').value) || 0;
+        const maxPrice = parseFloat(document.getElementById('maxPrice').value) || Infinity;
+        const selectedStores = Array.from(document.querySelectorAll('.store-cb:checked')).map(cb => cb.value);
+        const trustFilter = document.getElementById('trustFilter').value;
+        const ratingFilter = parseFloat(document.getElementById('ratingFilter').value) || 0;
+
+        // Filter the entire dataset
+        filteredProducts = allProducts.filter(p => {
+            const price = parseFloat(p.price) || 0;
+            const rating = parseFloat(p.rating) || 0;
+            const trust = p.trust_score || 0;
+            const priceMatch = (price >= minPrice && price <= maxPrice);
+            const storeMatch = (selectedStores.length === 0 || selectedStores.includes(p.source));
+            const ratingMatch = (rating >= ratingFilter);
+
+            let trustMatch = true;
+            if (trustFilter === 'high') trustMatch = (trust >= 80);
+            if (trustFilter === 'medium') trustMatch = (trust >= 60);
+
+            return priceMatch && storeMatch && ratingMatch && trustMatch;
+        });
+
+        // Reset display
+        displayedCount = 0;
+        document.getElementById('productResults').innerHTML = '';
+        renderStoreSections();
+
+        // Update count
+        const countText = document.querySelector('.results-toolbar p');
+        if (countText) {
+            countText.innerText = `Showing ${filteredProducts.length} items across ${new Set(filteredProducts.map(p => p.source)).size} stores.`;
+        }
+    }
+
+    function populateStoreFilters() {
+        const container = document.getElementById('storeFilters');
+        if (!container) return;
+
+        const sources = new Set(allProducts.map(p => p.source).filter(Boolean));
+        container.innerHTML = '';
+        sources.forEach(source => {
+            const label = document.createElement('label');
+            label.className = 'store-checkbox';
+            label.innerHTML = `
+                <input type="checkbox" class="store-cb" value="${source}" onchange="applyFilters(); this.parentElement.classList.toggle('active', this.checked)">
+                ${source}
+            `;
+            container.appendChild(label);
+        });
+    }
+
+    function resetFilters() {
+        if (document.getElementById('minPrice')) document.getElementById('minPrice').value = '';
+        if (document.getElementById('maxPrice')) document.getElementById('maxPrice').value = '';
+        if (document.getElementById('trustFilter')) document.getElementById('trustFilter').value = 'all';
+        if (document.getElementById('ratingFilter')) document.getElementById('ratingFilter').value = '0';
+
+        document.querySelectorAll('.store-cb').forEach(cb => {
+            cb.checked = false;
+            cb.parentElement.classList.remove('active');
+        });
+        applyFilters();
+    }
+
+    // Intersection Observer
+    const observer = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting && filteredProducts.length > displayedCount) {
+            loadMoreProducts();
+        }
+    }, { threshold: 0.1 });
+
+    // --- Voice Search Logic ---
+    function initVoiceSearch(btnId, targetInputId, iconId) {
+        const btn = document.getElementById(btnId);
+        const input = document.getElementById(targetInputId);
+        const icon = document.getElementById(iconId);
+
+        if (!btn || !input) return;
+
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SpeechRecognition) {
+            btn.style.display = 'none';
+            return;
+        }
+
+        const recognition = new SpeechRecognition();
+        recognition.continuous = false;
+        // Dynamic multi-accent language detection
+        const userLang = navigator.language || window.navigator.userLanguage || 'en-US';
+        recognition.lang = userLang;
+        recognition.interimResults = false;
+        recognition.maxAlternatives = 5; // Evaluates top 5 accent variations
+
+        let isListening = false;
+
+        btn.addEventListener('click', function (e) {
+            e.preventDefault();
+            try {
+                if (isListening) {
+                    recognition.stop();
+                } else {
+                    recognition.start();
+                }
+            } catch (err) {
+                console.error("SpeechRecognition start/stop error:", err);
+            }
+        });
+
+        recognition.onstart = function () {
+            isListening = true;
+            if (icon) {
+                icon.className = 'fas fa-microphone fa-beat';
+                icon.style.color = '#ef4444';
+            }
+        };
+
+        recognition.onend = function () {
+            isListening = false;
+            if (icon) {
+                icon.className = 'fas fa-microphone';
+                icon.style.color = 'var(--text-muted)';
+            }
+        };
+
+        recognition.onresult = function (event) {
+            const transcript = event.results[0][0].transcript;
+            input.value = transcript;
+            btn.blur();
+            if (typeof showLoading === 'function') {
+                showLoading();
+            }
+            setTimeout(() => {
+                input.form.submit();
+            }, 800);
+        };
+
+        recognition.onerror = function (event) {
+            console.error("Speech recognition error:", event.error);
+            isListening = false;
+            if (icon) {
+                icon.className = 'fas fa-microphone';
+                icon.style.color = 'var(--text-muted)';
+            }
+
+            // Standard user-visible diagnostics
+            if (event.error === 'not-allowed') {
+                alert("Microphone permission blocked! Please click the camera/microphone icon in your browser address bar and choose 'Allow' for this site.");
+            } else if (event.error === 'no-speech') {
+                alert("No speech detected. Please speak clearly and make sure your microphone is working.");
+            } else if (event.error === 'network') {
+                alert("Speech recognition network error! Please verify you are connected to the Internet.");
+            } else if (event.error === 'aborted') {
+                console.log("Speech recognition aborted by user.");
+            } else {
+                alert("Speech recognition error: " + event.error);
+            }
+        };
+    }
+
+    // --- Visual Search Logic ---
+    function initVisualSearch(inputId, previewId, imgId, searchInpId) {
+        const fileInp = document.getElementById(inputId);
+        const preview = document.getElementById(previewId);
+        const img = document.getElementById(imgId);
+        const searchInp = document.getElementById(searchInpId);
+
+        if (!fileInp) return;
+
+        fileInp.addEventListener('change', function (e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function (event) {
+                if (img) img.src = event.target.result;
+                if (preview) preview.style.display = 'flex';
+
+                const formData = new FormData();
+                formData.append('image', file);
+
+                fetch('/api/visual_search', { method: 'POST', body: formData })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.query) {
+                            if (searchInp) searchInp.value = data.query;
+                            window.location.href = `/dashboard?q=${encodeURIComponent(data.query)}`;
+                        } else {
+                            alert(data.error || "Could not identify product.");
+                        }
+                    })
+                    .catch(err => {
+                        console.error(err);
+                        alert("Vision engine error.");
+                    });
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+
+    function clearVisualSearch() {
+        ['visualSearchPreview', 'visualSearchPreviewResults'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.style.display = 'none';
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        initVisualSearch('visualSearchInput', 'visualSearchPreview', 'previewImg', 'searchInput');
+        initVisualSearch('visualSearchInputResults', 'visualSearchPreviewResults', 'previewImgResults', 'searchInputResults');
+        initVoiceSearch('voiceSearchBtn', 'searchInput', 'voiceSearchIcon');
+        initVoiceSearch('voiceSearchBtnResults', 'searchInputResults', 'voiceSearchIconResults');
+        initAutocomplete('searchInput', 'suggestionsBox', 'inlineSearch');
+        initAutocomplete('searchInputResults', 'suggestionsBoxResults', 'inlineSearchResults');
+
+        if (currentQuery && enabledSources.length > 0) {
+            // Trigger Progressive Asynchronous Loading
+            const statusBox = document.getElementById('scrapingStatus');
+            const loader = document.getElementById('loadingIndicator');
+            const results = document.getElementById('productResults');
+            if (statusBox) statusBox.style.display = 'block';
+            if (loader) loader.style.display = 'block';
+            if (results) results.style.display = 'grid';
+
+            document.getElementById('noResults').style.display = 'none';
+            document.getElementById('scrollAnchor').style.display = 'none';
+
+            triggerProgressiveLoading();
+        } else {
+            populateStoreFilters();
+
+            // Safety: Always hide loader and show results container on fresh load
+            const loader = document.getElementById('loadingIndicator');
+            const results = document.getElementById('productResults');
+            if (loader) loader.style.display = 'none';
+            if (results) results.style.display = 'grid';
+
+            if (allProducts.length > 0) {
+                loadMoreProducts();
+                observer.observe(document.getElementById('scrollAnchor'));
+            } else {
+                if (currentQuery) {
+                    document.getElementById('noResults').style.display = 'block';
+                }
+                document.getElementById('scrollAnchor').style.display = 'none';
+            }
+        }
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,846 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard - Smart Shopping{% endblock %}
+
+{% block extra_css %}
+<style>
+    body {
+        background-color: var(--bg-body);
+    }
+
+    .admin-wrapper {
+        display: flex;
+        background: var(--bg-card);
+        color: var(--text-main);
+        border-radius: 0.5rem;
+        overflow: hidden;
+        min-height: 90vh;
+        border: 1px solid var(--border);
+        box-shadow: 0 20px 50px -12px rgba(0, 0, 0, 0.2);
+        margin: 1.5rem 0;
+        position: relative;
+    }
+
+    [data-theme="dark"] .admin-wrapper {
+        background: #0f172a;
+        border-color: rgba(255, 255, 255, 0.05);
+    }
+
+    .admin-sidebar {
+        width: 260px;
+        background: #0f172a;
+        padding: 2rem 0;
+        display: flex;
+        flex-direction: column;
+        border-right: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .admin-logo {
+        padding: 0 1.5rem 2rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        font-size: 1rem;
+        font-weight: 800;
+        color: #f8fafc;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-bottom: 1rem;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+    }
+
+    .admin-nav {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+        padding: 0 0.75rem;
+    }
+
+    .admin-nav a {
+        padding: 0.75rem 1rem;
+        color: #64748b;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        border-radius: 0.375rem;
+        font-weight: 600;
+        font-size: 0.85rem;
+        transition: all 0.2s ease;
+    }
+
+    .admin-nav a:hover {
+        background-color: rgba(255, 255, 255, 0.03);
+        color: #f8fafc;
+    }
+
+    .admin-nav a.active {
+        background: rgba(99, 102, 241, 0.1);
+        color: #818cf8;
+        box-shadow: inset 3px 0 0 #818cf8;
+    }
+
+    .admin-main {
+        flex: 1;
+        padding: 2.5rem;
+        overflow-y: auto;
+        background: #f8fafc;
+    }
+
+    [data-theme="dark"] .admin-main {
+        background: #0f172a;
+    }
+
+    .admin-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1.5rem;
+        margin-bottom: 2.5rem;
+    }
+
+    .stat-card {
+        padding: 1.5rem;
+        border-radius: 0.5rem;
+        background: white;
+        border: 1px solid #e2e8f0;
+        display: flex;
+        flex-direction: column;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+    }
+
+    [data-theme="dark"] .stat-card {
+        background: #1e293b;
+        border-color: rgba(255, 255, 255, 0.05);
+    }
+
+    .stat-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    }
+
+    .stat-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+
+    .stat-card h3 {
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #64748b;
+    }
+
+    .stat-icon {
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 0.375rem;
+        font-size: 1rem;
+    }
+
+    .stat-card .value {
+        font-size: 1.75rem;
+        font-weight: 800;
+        color: #1e293b;
+        letter-spacing: -0.02em;
+    }
+
+    [data-theme="dark"] .stat-card .value {
+        color: #f8fafc;
+    }
+
+    .stat-meta {
+        margin-top: 0.75rem;
+        font-size: 0.75rem;
+        color: #94a3b8;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    /* Professional monochromatic look with clean accented borders */
+    .bg-blue .stat-icon {
+        background: rgba(59, 130, 246, 0.1);
+        color: #3b82f6;
+    }
+
+    .bg-orange .stat-icon {
+        background: rgba(245, 158, 11, 0.1);
+        color: #f59e0b;
+    }
+
+    .bg-green .stat-icon {
+        background: rgba(16, 185, 129, 0.1);
+        color: #10b981;
+    }
+
+    .bg-red .stat-icon {
+        background: rgba(239, 68, 68, 0.1);
+        color: #ef4444;
+    }
+
+    .table-container {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 0.5rem;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    [data-theme="dark"] .table-container {
+        background: #1e293b;
+        border-color: rgba(255, 255, 255, 0.05);
+    }
+
+    .table-container h4 {
+        margin-bottom: 1.5rem;
+        font-weight: 700;
+        font-size: 0.9rem;
+        color: #1e293b;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    [data-theme="dark"] .table-container h4 {
+        color: #f8fafc;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    th {
+        text-align: left;
+        padding: 0.75rem 1rem;
+        font-size: 0.65rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: #64748b;
+        border-bottom: 1px solid #e2e8f0;
+        background: #f8fafc;
+    }
+
+    [data-theme="dark"] th {
+        background: rgba(255, 255, 255, 0.02);
+        border-color: rgba(255, 255, 255, 0.05);
+    }
+
+    td {
+        padding: 1rem;
+        font-size: 0.85rem;
+        color: #475569;
+        border-bottom: 1px solid #f1f5f9;
+    }
+
+    [data-theme="dark"] td {
+        color: #94a3b8;
+        border-color: rgba(255, 255, 255, 0.05);
+    }
+
+    .btn-action {
+        padding: 0.4rem 0.75rem;
+        border-radius: 0.25rem;
+        font-weight: 700;
+        font-size: 0.75rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .btn-delete {
+        background: rgba(239, 68, 68, 0.1);
+        color: #ef4444;
+        border: 1px solid rgba(239, 68, 68, 0.1);
+    }
+
+    .btn-delete:hover {
+        background: #ef4444;
+        color: white;
+    }
+
+    .status-badge {
+        padding: 0.25rem 0.5rem;
+        border-radius: 9999px;
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+    }
+
+    .status-healthy {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    .status-issue {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+
+    /* Featured Grid */
+    .featured-admin-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 1.25rem;
+    }
+
+    .featured-admin-card {
+        background: white;
+        border-radius: 0.5rem;
+        border: 1px solid #e2e8f0;
+        padding: 1rem;
+        transition: all 0.2s ease;
+    }
+
+    [data-theme="dark"] .featured-admin-card {
+        background: #1e293b;
+        border-color: rgba(255, 255, 255, 0.05);
+    }
+
+    .featured-admin-card:hover {
+        border-color: #cbd5e1;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+
+    .featured-admin-card img {
+        width: 100%;
+        height: 100px;
+        object-fit: contain;
+        background: #f8fafc;
+        border-radius: 0.375rem;
+        margin-bottom: 1rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="admin-wrapper">
+    <!-- Sidebar -->
+    <div class="admin-sidebar">
+        <div class="admin-logo">
+            <i class="fas fa-shield-alt" style="color: var(--primary);"></i> ADMIN PANEL
+        </div>
+        <div class="admin-nav">
+            <a href="{{ url_for('admin') }}" class="{% if section == 'dashboard' %}active{% endif %}">
+                <i class="fas fa-chart-pie"></i> Dashboard
+            </a>
+            <a href="{{ url_for('admin_users') }}" class="{% if section == 'users' %}active{% endif %}">
+                <i class="fas fa-users-cog"></i> Users
+            </a>
+            <a href="{{ url_for('admin_analytics') }}" class="{% if section == 'analytics' %}active{% endif %}">
+                <i class="fas fa-activity"></i> Search Logs
+            </a>
+            <a href="{{ url_for('admin_products') }}" class="{% if section == 'products' %}active{% endif %}">
+                <i class="fas fa-star"></i> Featured
+            </a>
+            <a href="{{ url_for('admin_settings') }}" class="{% if section == 'settings' %}active{% endif %}">
+                <i class="fas fa-sliders-h"></i> Configuration
+            </a>
+            <a href="{{ url_for('admin_messages') }}" class="{% if section == 'messages' %}active{% endif %}">
+                <i class="fas fa-envelope-open-text"></i> Messages
+            </a>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="admin-main">
+        <div class="admin-header">
+            <h2>{{ section | title }}</h2>
+            <div class="admin-header-right">
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                    <div style="text-align: right;">
+                        <div style="font-weight: 700; color: var(--text-main); font-size: 0.9rem;">System Admin</div>
+                        <div style="font-size: 0.75rem;">Active Session</div>
+                    </div>
+                    <i class="fas fa-user-circle" style="font-size: 2.5rem; color: var(--primary);"></i>
+                </div>
+                <a href="{{ url_for('admin_logout') }}" class="btn-action btn-delete" title="Sign Out">
+                    <i class="fas fa-power-off"></i> Logout
+                </a>
+            </div>
+        </div>
+
+        {% if section == 'dashboard' %}
+        <div class="admin-grid">
+            <div class="stat-card bg-blue">
+                <div class="stat-header">
+                    <h3>Total Analytics</h3>
+                    <div class="stat-icon"><i class="fas fa-search"></i></div>
+                </div>
+                <div class="value">{{ queries_count }}</div>
+                <div class="stat-meta">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Real-time tracking active</span>
+                </div>
+            </div>
+
+            <div class="stat-card bg-green">
+                <div class="stat-header">
+                    <h3>Active Users</h3>
+                    <div class="stat-icon"><i class="fas fa-user-friends"></i></div>
+                </div>
+                <div class="value">{{ users_count }}</div>
+                <div class="stat-meta">
+                    <i class="fas fa-shield-check"></i>
+                    <span>Verified accounts</span>
+                </div>
+            </div>
+
+            <div class="stat-card bg-orange">
+                <div class="stat-header">
+                    <h3>Peak Interest</h3>
+                    <div class="stat-icon"><i class="fas fa-fire"></i></div>
+                </div>
+                <div class="value" style="font-size: 1.25rem;">
+                    {% if popular_queries %}
+                    {{ popular_queries[0][0] }}
+                    {% else %}
+                    N/A
+                    {% endif %}
+                </div>
+                <div class="stat-meta">
+                    <i class="fas fa-arrow-up"></i>
+                    <span>Trending now</span>
+                </div>
+            </div>
+
+            <div class="stat-card bg-red">
+                <div class="stat-header">
+                    <h3>System Engine</h3>
+                    <div class="stat-icon"><i
+                            class="fas {% if all_scrapers_active %}fa-check-circle{% else %}fa-exclamation-triangle{% endif %}"></i>
+                    </div>
+                </div>
+                <div class="value" style="font-size: 1.25rem;">{% if all_scrapers_active %}Optimal{% else %}Warning{%
+                    endif %}</div>
+                <div class="stat-meta">
+                    <span
+                        class="status-badge {% if all_scrapers_active %}status-healthy{% else %}status-issue{% endif %}">
+                        {% if all_scrapers_active %}Healthy{% else %}Issue{% endif %}
+                    </span>
+                    <span>Monitoring active</span>
+                </div>
+            </div>
+
+            <!-- Outgoing Traffic Card -->
+            <div class="stat-card bg-blue" style="border-top: 3px solid #3b82f6;">
+                <div class="stat-header">
+                    <h3>Outgoing Traffic</h3>
+                    <div class="stat-icon"><i class="fas fa-external-link-alt"></i></div>
+                </div>
+                <div class="value">{{ clicks_count }}</div>
+                <div class="stat-meta">
+                    <i class="fas fa-share-square"></i>
+                    <span>Clicks sent to stores</span>
+                </div>
+            </div>
+
+            <!-- Simulated Earnings Card -->
+            <div class="stat-card bg-green" style="border-top: 3px solid #10b981;">
+                <div class="stat-header">
+                    <h3>Affiliate Earnings</h3>
+                    <div class="stat-icon"><i class="fas fa-wallet"></i></div>
+                </div>
+                <div class="value" style="font-size: 1.4rem;">Rs. {{ "{:,.2f}".format(total_commission) }}</div>
+                <div class="stat-meta">
+                    <i class="fas fa-hand-holding-usd"></i>
+                    <span>Est. 3% platform fee</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="table-container" style="margin-bottom: 2rem;">
+            <h4><i class="fas fa-chart-line" style="color: var(--primary);"></i> Search Volume Forecast</h4>
+            <div style="height: 300px; position: relative;">
+                <canvas id="adminTrendChart"></canvas>
+                <div id="admin-chart-data" style="display:none;" data-labels='{{ chart_labels | tojson | safe }}'
+                    data-values='{{ chart_data | tojson | safe }}'></div>
+            </div>
+        </div>
+
+        <!-- Monetization Analytics Table Block -->
+        <div style="display: grid; grid-template-columns: 1fr 1.5fr; gap: 2rem; margin-bottom: 2rem;">
+            <div class="table-container">
+                <h4>Store Traffic Distribution</h4>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Store</th>
+                            <th>Clicks Sent</th>
+                            <th>Commission (Est.)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in clicks_by_store %}
+                        <tr>
+                            <td style="font-weight: 700; text-transform: capitalize;">{{ item.store_name }}</td>
+                            <td><span style="font-weight: 700; color: var(--primary);">{{ item.count }}</span></td>
+                            <td style="font-weight: 700; color: #10b981;">Rs. {{ "{:,.2f}".format(item.commission) }}
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="3" style="text-align: center; color: var(--text-muted); padding: 1.5rem;">No
+                                store redirects recorded.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="table-container">
+                <h4>Recent Redirection Log</h4>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Timestamp</th>
+                            <th>Store</th>
+                            <th>Product Info</th>
+                            <th>Price</th>
+                            <th>Commission (3%)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for click in recent_clicks %}
+                        <tr>
+                            <td style="font-size: 0.75rem; color: var(--text-muted);">{{ click.timestamp }}</td>
+                            <td style="font-weight: bold; text-transform: capitalize;">{{ click.store_name }}</td>
+                            <td style="max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 0.8rem;"
+                                title="{{ click.product_title }}">
+                                {{ click.product_title }}
+                            </td>
+                            <td style="font-weight: 600;">Rs. {{ "{:,.0f}".format(click.price) }}</td>
+                            <td style="font-weight: 700; color: #10b981;">Rs. {{ "{:,.2f}".format(click.commission) }}
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 1.5rem;">No
+                                traffic redirects logged yet.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 2rem;">
+            <div class="table-container">
+                <h4>Recent Search Activity</h4>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Query</th>
+                            <th>Time</th>
+                            <th>Results</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for q in recent_queries %}
+                        <tr>
+                            <td style="font-weight: 600;">{{ q.query }}</td>
+                            <td style="color: var(--text-muted);">{{ q.timestamp.split(' ')[1] }}</td>
+                            <td><span class="trend-tag trend-down" style="background:#e0f2fe; color:#0369a1;">{{
+                                    q.results_count }} found</span></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="table-container">
+                <h4>Trending Terms</h4>
+                {% for pq in popular_queries %}
+                <div
+                    style="display: flex; justify-content: space-between; align-items: center; padding: 1rem 0; border-bottom: 1px solid var(--border);">
+                    <span style="font-weight: 600;">{{ pq.query }}</span>
+                    <span
+                        style="background: var(--primary); color: white; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 700;">{{
+                        pq.count }} hits</span>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        {% if section == 'users' %}
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>User Name</th>
+                        <th>Email Address</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users %}
+                    <tr>
+                        <td>#{{ user.id }}</td>
+                        <td style="font-weight: 600;">{{ user.first_name }} {{ user.last_name }}</td>
+                        <td>{{ user.email }}</td>
+                        <td>
+                            <form action="{{ url_for('delete_user', user_id=user.id) }}" method="POST"
+                                onsubmit="return confirm('Permanently delete this user account?');">
+                                <button type="submit" class="btn-action btn-delete">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
+
+        {% if section == 'analytics' %}
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Search Term</th>
+                        <th>Origin IP</th>
+                        <th>Date & Time</th>
+                        <th>Count</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for q in queries %}
+                    <tr>
+                        <td style="font-weight: 600;">{{ q.query }}</td>
+                        <td style="font-family: monospace; color: var(--text-muted);">{{ q.user_ip }}</td>
+                        <td>{{ q.timestamp }}</td>
+                        <td>{{ q.results_count }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
+
+        {% if section == 'products' %}
+        <div class="table-container" style="margin-bottom: 3rem;">
+            <h4>Promotion Settings</h4>
+            <form action="{{ url_for('add_product') }}" method="POST"
+                style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem;">
+                <input type="text" name="name" class="form-input" placeholder="Product Name" required>
+                <input type="number" step="0.01" name="price" class="form-input" placeholder="Display Price" required>
+                <input type="text" name="image" class="form-input" placeholder="Thumbnail URL">
+                <input type="text" name="source" class="form-input" placeholder="Marketplace (e.g. eBay)">
+                <input type="text" name="url" class="form-input" placeholder="Redirect Link" required>
+                <button type="submit" class="btn-primary" style="padding: 0.75rem;">Highlight Product</button>
+            </form>
+        </div>
+
+        <div class="featured-admin-grid">
+            {% for product in products %}
+            <div class="featured-admin-card">
+                <img src="{{ product.image }}" onerror="this.src='https://via.placeholder.com/200?text=No+Image';"
+                    alt="{{ product.name }}">
+                <div style="flex: 1;">
+                    <div
+                        style="font-weight: 700; font-size: 0.9rem; margin-bottom: 0.5rem; height: 2.7rem; overflow: hidden;">
+                        {{ product.name }}</div>
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-weight: 800; color: var(--primary);">Rs. {{ "{:,.0f}".format(product.price |
+                            float) }}</span>
+                        <span
+                            style="font-size: 0.75rem; background: var(--bg-body); padding: 0.2rem 0.5rem; border-radius: 0.25rem;">{{
+                            product.source }}</span>
+                    </div>
+                </div>
+                <form action="{{ url_for('delete_product', product_id=product.id) }}" method="POST"
+                    onsubmit="return confirm('Remove this featured item?');">
+                    <button type="submit" class="btn-action btn-delete" style="width: 100%;">
+                        <i class="fas fa-trash-alt" style="margin-right: 0.5rem;"></i> Remove Item
+                    </button>
+                </form>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {% if section == 'messages' %}
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Sender</th>
+                        <th>Category</th>
+                        <th>Message</th>
+                        <th>Date</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for msg in messages %}
+                    <tr>
+                        <td>
+                            <div style="font-weight: 700;">{{ msg.name }}</div>
+                            <div style="font-size: 0.8rem; color: var(--text-muted);">{{ msg.email }}</div>
+                        </td>
+                        <td>
+                            <span
+                                style="background: rgba(99, 102, 241, 0.1); color: var(--primary); padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 700;">
+                                {{ msg.category }}
+                            </span>
+                        </td>
+                        <td style="max-width: 400px; font-size: 0.9rem; line-height: 1.5;">{{ msg.message }}</td>
+                        <td style="font-size: 0.85rem; color: var(--text-muted);">{{ msg.timestamp }}</td>
+                        <td>
+                            <form action="{{ url_for('delete_message', msg_id=msg.id) }}" method="POST"
+                                onsubmit="return confirm('Delete this message?');">
+                                <button type="submit" class="btn-action btn-delete">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
+
+        {% if section == 'settings' %}
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+            <div class="table-container">
+                <h4><i class="fas fa-microchip" style="color: var(--primary);"></i> Engine Configuration</h4>
+                {% for source in ['amazon', 'ebay', 'daraz', 'telemart', 'surmawala', 'mega', 'clicky', 'ubuy',
+                'shophive', 'priceoye', 'alfatah'] %}
+                <div
+                    style="display: flex; justify-content: space-between; align-items: center; padding: 1.5rem 0; border-bottom: 1px solid var(--border);">
+                    <div>
+                        <span style="font-weight: 700; text-transform: capitalize; color: var(--text-main);">{{ source
+                            }}</span>
+                        <div style="font-size: 0.75rem; color: var(--text-muted);">Real-time data extraction</div>
+                    </div>
+                    <form action="{{ url_for('toggle_source') }}" method="POST">
+                        <input type="hidden" name="source" value="{{ source }}">
+                        <input type="hidden" name="current_val" value="{{ settings[source + '_enabled'] }}">
+                        <button type="submit"
+                            class="btn-action {% if settings[source + '_enabled'] == 'true' %}status-running{% else %}status-stopped{% endif %}"
+                            style="min-width: 120px; border-radius: 9999px;">
+                            <i class="fas {% if settings[source + '_enabled'] == 'true' %}fa-play-circle{% else %}fa-stop-circle{% endif %}"
+                                style="margin-right:0.5rem;"></i>
+                            {% if settings[source + '_enabled'] == 'true' %}Running{% else %}Stopped{% endif %}
+                        </button>
+                    </form>
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="table-container">
+                <h4>Security Refresh</h4>
+                <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 2rem;">Update the master
+                    administrative password. Ensure it meets security standards.</p>
+                <form action="{{ url_for('update_admin_password') }}" method="POST">
+                    <div style="margin-bottom: 1.5rem;">
+                        <input type="password" name="new_password" class="form-input" placeholder="New Secure Password"
+                            required style="width: 100%;">
+                    </div>
+                    <div style="margin-bottom: 2rem;">
+                        <input type="password" name="confirm_password" class="form-input"
+                            placeholder="Verify New Password" required style="width: 100%;">
+                    </div>
+                    <button type="submit" class="btn-primary" style="width: 100%; padding: 1rem;">Update Access
+                        Credentials</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+</div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        if (document.getElementById('adminTrendChart')) {
+            const ctx = document.getElementById('adminTrendChart').getContext('2d');
+            const dataEl = document.getElementById('admin-chart-data');
+
+            let labels = ['No Data'];
+            let searchData = [0];
+
+            if (dataEl) {
+                try {
+                    labels = JSON.parse(dataEl.getAttribute('data-labels') || '[]');
+                    searchData = JSON.parse(dataEl.getAttribute('data-values') || '[]');
+                } catch (e) {
+                    console.error('Error parsing chart data', e);
+                }
+            }
+
+            if (!labels || labels.length === 0) labels = ['No Data'];
+            if (!searchData || searchData.length === 0) searchData = [0];
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Search Volume',
+                        data: searchData,
+                        borderColor: '#6366f1',
+                        backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                        fill: true,
+                        tension: 0.4,
+                        borderWidth: 3,
+                        pointBackgroundColor: '#6366f1',
+                        pointBorderColor: '#ffffff',
+                        pointBorderWidth: 2,
+                        pointRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: 'rgba(0, 0, 0, 0.05)' },
+                            ticks: {
+                                color: '#94a3b8',
+                                stepSize: 1
+                            }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: '#94a3b8' }
+                        }
+                    }
+                }
+            });
+        }
+    });
+
+    // Real-time Health Monitor logic (Optional Simulation)
+    function updateSystemHealth() {
+        const healthCard = document.querySelector('.bg-red');
+        if (healthCard) {
+            const status = Math.random() > 0.1 ? 'Optimal' : 'Checking...';
+            healthCard.querySelector('.value').innerText = status;
+        }
+    }
+    setInterval(updateSystemHealth, 30000); // Check every 30s
+</script>
+{% endblock %}

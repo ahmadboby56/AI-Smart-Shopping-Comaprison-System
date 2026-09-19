@@ -1,0 +1,288 @@
+{% extends "base.html" %}
+{% block title %}My Price Alerts - Smart Shopping{% endblock %}
+
+{% block extra_css %}
+<style>
+    .alerts-page {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 2rem 0;
+    }
+
+    .page-header {
+        display: flex;
+        align-items: center;
+        gap: 1.25rem;
+        margin-bottom: 2.5rem;
+    }
+
+    .page-header-icon {
+        width: 3.5rem;
+        height: 3.5rem;
+        background: linear-gradient(135deg, #6366f1, #10b981);
+        border-radius: 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+    }
+
+    .alerts-grid {
+        display: grid;
+        gap: 1.25rem;
+    }
+
+    .alert-card {
+        background: rgba(var(--bg-card-rgb), 0.7);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 1.5rem;
+        padding: 1.5rem 2rem;
+        display: grid;
+        grid-template-columns: 80px 1fr auto;
+        align-items: center;
+        gap: 1.5rem;
+        transition: all 0.3s ease;
+    }
+
+    .alert-card:hover {
+        border-color: var(--primary);
+        transform: translateY(-3px);
+        box-shadow: 0 10px 30px rgba(99, 102, 241, 0.1);
+    }
+
+    .alert-card.triggered {
+        opacity: 0.6;
+        border-color: #10b981;
+    }
+
+    .alert-img {
+        width: 80px;
+        height: 80px;
+        object-fit: contain;
+        background: white;
+        border-radius: 0.75rem;
+        padding: 0.5rem;
+        border: 1px solid var(--border);
+    }
+
+    .alert-info h3 {
+        font-size: 1rem;
+        font-weight: 700;
+        color: var(--text-main);
+        margin-bottom: 0.5rem;
+        overflow: hidden;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        line-clamp: 2;
+        -webkit-box-orient: vertical;
+    }
+
+    .alert-meta {
+        display: flex;
+        gap: 1.5rem;
+        flex-wrap: wrap;
+    }
+
+    .alert-meta-item {
+        display: flex;
+        flex-direction: column;
+        gap: 0.2rem;
+    }
+
+    .alert-meta-label {
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--text-muted);
+        font-weight: 700;
+    }
+
+    .alert-meta-value {
+        font-size: 1rem;
+        font-weight: 800;
+        color: var(--text-main);
+    }
+
+    .alert-meta-value.target {
+        color: #6366f1;
+    }
+
+    .alert-meta-value.current {
+        color: #10b981;
+    }
+
+    .alert-meta-value.triggered {
+        color: #10b981;
+    }
+
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        padding: 0.35rem 0.85rem;
+        border-radius: 9999px;
+        font-size: 0.75rem;
+        font-weight: 700;
+    }
+
+    .status-badge.active {
+        background: rgba(99, 102, 241, 0.15);
+        color: #6366f1;
+        border: 1px solid rgba(99, 102, 241, 0.3);
+    }
+
+    .status-badge.triggered {
+        background: rgba(16, 185, 129, 0.15);
+        color: #10b981;
+        border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .alert-actions {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 0.75rem;
+    }
+
+    .btn-delete-alert {
+        background: transparent;
+        border: 1px solid var(--border);
+        color: var(--text-muted);
+        padding: 0.5rem 1rem;
+        border-radius: 0.75rem;
+        font-size: 0.8rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: var(--transition);
+    }
+
+    .btn-delete-alert:hover {
+        border-color: #ef4444;
+        color: #ef4444;
+        background: rgba(239, 68, 68, 0.05);
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 5rem 2rem;
+        background: var(--bg-card);
+        border-radius: 1.5rem;
+        border: 1px dashed var(--border);
+    }
+
+    .empty-state-icon {
+        font-size: 3.5rem;
+        margin-bottom: 1.5rem;
+        display: block;
+    }
+
+    @media (max-width: 640px) {
+        .alert-card {
+            grid-template-columns: 1fr;
+        }
+
+        .alert-img {
+            display: none;
+        }
+
+        .alert-actions {
+            align-items: flex-start;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="alerts-page">
+    <div class="page-header">
+        <div class="page-header-icon">🔔</div>
+        <div>
+            <h1 style="font-size: 1.75rem; font-weight: 800;">My Price Alerts</h1>
+            <p style="color: var(--text-muted); margin-top: 0.25rem;">We'll email you when a product drops to your
+                target price.</p>
+        </div>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    {% for category, message in messages %}
+    <div style="padding: 1rem 1.5rem; border-radius: 0.75rem; margin-bottom: 1.5rem;
+                background: {% if category == 'success' %}rgba(16,185,129,0.1){% else %}rgba(239,68,68,0.1){% endif %};
+                border: 1px solid {% if category == 'success' %}#10b981{% else %}#ef4444{% endif %};
+                color: {% if category == 'success' %}#10b981{% else %}#ef4444{% endif %};">
+        {{ message }}
+    </div>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+
+    {% if alerts %}
+    <div class="alerts-grid">
+        {% for alert in alerts %}
+        <div class="alert-card {% if alert.triggered %}triggered{% endif %}">
+            <img class="alert-img" src="{{ alert.image or 'https://via.placeholder.com/80' }}"
+                onerror="this.src='https://via.placeholder.com/80?text=No+Image';" alt="{{ alert.product_name }}">
+
+            <div class="alert-info">
+                <h3>{{ alert.product_name }}</h3>
+                <div class="alert-meta">
+                    <div class="alert-meta-item">
+                        <span class="alert-meta-label">Target Price</span>
+                        <span class="alert-meta-value target">Rs. {{ "{:,.0f}".format(alert.target_price) }}</span>
+                    </div>
+                    {% if alert.current_price %}
+                    <div class="alert-meta-item">
+                        <span class="alert-meta-label">Found At</span>
+                        <span class="alert-meta-value current">Rs. {{ "{:,.0f}".format(alert.current_price) }}</span>
+                    </div>
+                    {% endif %}
+                    <div class="alert-meta-item">
+                        <span class="alert-meta-label">Source</span>
+                        <span class="alert-meta-value">{{ alert.source or 'Any' }}</span>
+                    </div>
+                    <div class="alert-meta-item">
+                        <span class="alert-meta-label">Created</span>
+                        <span class="alert-meta-value" style="font-size: 0.85rem;">{{ alert.created_at.split(' ')[0] if
+                            alert.created_at else '—' }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="alert-actions">
+                {% if alert.triggered %}
+                <span class="status-badge triggered"><i class="fas fa-check-circle"></i> Triggered</span>
+                {% else %}
+                <span class="status-badge active"><i class="fas fa-bell"></i> Watching</span>
+                {% endif %}
+
+                <a href="{{ alert.url or '#' }}" target="_blank"
+                    style="font-size: 0.8rem; color: var(--primary); text-decoration: none; font-weight: 600;">
+                    <i class="fas fa-external-link-alt"></i> View Product
+                </a>
+
+                <form action="{{ url_for('delete_alert', alert_id=alert.id) }}" method="POST">
+                    <button type="submit" class="btn-delete-alert" onclick="return confirm('Delete this alert?');">
+                        <i class="fas fa-trash"></i> Delete
+                    </button>
+                </form>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <span class="empty-state-icon">🔔</span>
+        <h2 style="font-size: 1.5rem; font-weight: 700;">No alerts yet</h2>
+        <p
+            style="color: var(--text-muted); margin-top: 0.5rem; max-width: 400px; margin-left: auto; margin-right: auto;">
+            Set a target price on any product on the search page and we'll email you when it drops!
+        </p>
+        <a href="{{ url_for('dashboard') }}" class="btn-primary"
+            style="display: inline-block; margin-top: 2rem; padding: 0.75rem 2rem; border-radius: 9999px; text-decoration: none; color: white; background: var(--primary); font-weight: 700;">
+            <i class="fas fa-search"></i> Search Products
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

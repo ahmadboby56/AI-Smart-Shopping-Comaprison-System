@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Smart Shopping{% endblock %}</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Source+Sans+Pro:wght@400;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <style>
+        /* Modern Design System & Variables */
+        :root {
+            /* Light Mode Palette */
+            --primary: #6366f1;
+            --primary-rgb: 99, 102, 241;
+            --primary-hover: #4f46e5;
+            --secondary: #10b981;
+            --bg-body: #f8fafc;
+            --bg-card: #ffffff;
+            --bg-card-rgb: 255, 255, 255;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --navbar-bg: rgba(255, 255, 255, 0.8);
+            --footer-bg: #0f172a;
+            --white: #ffffff;
+            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        [data-theme="dark"] {
+            --bg-body: #0f172a;
+            --bg-card: #1e293b;
+            --bg-card-rgb: 30, 41, 59;
+            --text-main: #f1f5f9;
+            --text-muted: #94a3b8;
+            --border: #334155;
+            --navbar-bg: rgba(15, 23, 42, 0.8);
+            --shadow: 0 10px 15px -3px rgb(0 0 0 / 0.3);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', 'Source Sans Pro', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            transition: var(--transition);
+            line-height: 1.5;
+        }
+
+        /* Typography */
+        h1,
+        h2,
+        h3,
+        .logo {
+            font-family: 'Outfit', 'Playfair Display', serif;
+            font-weight: 700;
+        }
+
+        /* Navbar */
+        .navbar {
+            background-color: var(--navbar-bg);
+            backdrop-filter: blur(12px);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 1px solid var(--border);
+            transition: var(--transition);
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            text-decoration: none;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-main);
+            font-size: 0.95rem;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+
+        /* Theme Toggle */
+        .theme-toggle {
+            background: none;
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+
+        .theme-toggle:hover {
+            background: var(--border);
+        }
+
+        /* Main Content wrapper */
+        .main-content {
+            flex: 1;
+            padding: 2.5rem 1.5rem;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        /* Footer */
+        .footer {
+            background-color: var(--footer-bg);
+            color: #94a3b8;
+            padding: 4rem 2rem;
+            display: grid;
+            grid-template-columns: 2fr 1fr 1.5fr;
+            gap: 3rem;
+            border-top: 1px solid var(--border);
+        }
+
+        @media (max-width: 800px) {
+            .footer {
+                grid-template-columns: 1fr;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            /* Simplified for mobile fix later */
+        }
+
+        .footer-logo {
+            color: var(--white);
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .footer-text {
+            font-size: 0.9rem;
+            line-height: 1.7;
+            margin-bottom: 1.5rem;
+        }
+
+        .footer-links h4,
+        .newsletter h4 {
+            color: var(--white);
+            margin-bottom: 1.5rem;
+            font-size: 1.1rem;
+        }
+
+        .footer-links ul {
+            list-style: none;
+        }
+
+        .footer-links ul li {
+            margin-bottom: 0.75rem;
+        }
+
+        .footer-links ul li a {
+            color: #94a3b8;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .footer-links ul li a:hover {
+            color: var(--primary);
+        }
+
+        .newsletter-form {
+            display: flex;
+            background: #1e293b;
+            padding: 0.25rem;
+            border-radius: 0.5rem;
+            border: 1px solid #334155;
+        }
+
+        .newsletter-form input {
+            background: transparent;
+            color: white;
+            padding: 0.75rem;
+            border: none;
+            outline: none;
+            flex: 1;
+        }
+
+        .newsletter-form button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.4rem;
+            cursor: pointer;
+            font-weight: 700;
+            transition: var(--transition);
+        }
+
+        .newsletter-form button:hover {
+            background: var(--primary-hover);
+        }
+
+        .social-links {
+            margin-top: 1.5rem;
+            display: flex;
+            gap: 1rem;
+        }
+
+        .social-links a {
+            width: 2.5rem;
+            height: 2.5rem;
+            background: #1e293b;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            color: white;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .social-links a:hover {
+            background: var(--primary);
+            transform: translateY(-3px);
+        }
+
+        /* Utility Components */
+        .btn-primary {
+            background-color: var(--primary);
+            color: var(--white);
+            border: none;
+            padding: 0.75rem 1.75rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+            box-shadow: 0 4px 6px -1px rgba(99, 102, 241, 0.4);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.4);
+        }
+
+        .flash-message {
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+        }
+
+        .flash-success {
+            background: #dcfce7;
+            color: #166534;
+            border-left: 5px solid #22c55e;
+        }
+
+        .flash-error {
+            background: #fee2e2;
+            color: #991b1b;
+            border-left: 5px solid #ef4444;
+        }
+
+        /* AI Chatbot Floating Styles */
+        .ai-chat-launcher {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 3.5rem;
+            height: 3.5rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 10px 25px -5px rgba(99, 102, 241, 0.5);
+            z-index: 9999;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .ai-chat-launcher:hover {
+            transform: scale(1.1) rotate(5deg);
+            box-shadow: 0 15px 30px -5px rgba(99, 102, 241, 0.7);
+        }
+
+        .ai-chat-launcher .notification-dot {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            width: 12px;
+            height: 12px;
+            background-color: #ef4444;
+            border: 2px solid white;
+            border-radius: 50%;
+            display: block;
+        }
+
+        .ai-chat-window {
+            position: fixed;
+            bottom: 6.5rem;
+            right: 2rem;
+            width: 375px;
+            height: 480px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 1.25rem;
+            box-shadow: var(--shadow);
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            transform: translateY(20px) scale(0.95);
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .ai-chat-window.open {
+            transform: translateY(0) scale(1);
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .ai-chat-header {
+            padding: 1.25rem;
+            background: linear-gradient(135deg, var(--primary), var(--primary-hover));
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .ai-chat-header h4 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.05rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .ai-chat-header .close-btn {
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .ai-chat-header .close-btn:hover {
+            color: white;
+        }
+
+        .ai-chat-messages {
+            flex: 1;
+            padding: 1.25rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            background: rgba(0, 0, 0, 0.01);
+        }
+
+        .message-bubble {
+            max-width: 80%;
+            padding: 0.75rem 1rem;
+            border-radius: 1rem;
+            font-size: 0.85rem;
+            line-height: 1.4;
+            animation: bubbleFadeIn 0.25s ease-out forwards;
+        }
+
+        .message-bubble.user {
+            background: var(--primary);
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 0.25rem;
+        }
+
+        .message-bubble.bot {
+            background: var(--border);
+            color: var(--text-main);
+            align-self: flex-start;
+            border-bottom-left-radius: 0.25rem;
+        }
+
+        .ai-chat-input-area {
+            padding: 1rem;
+            border-top: 1px solid var(--border);
+            background: var(--bg-card);
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .ai-chat-input-area input {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--border);
+            border-radius: 0.75rem;
+            outline: none;
+            background: var(--bg-body);
+            color: var(--text-main);
+            font-size: 0.85rem;
+            transition: var(--transition);
+        }
+
+        .ai-chat-input-area input:focus {
+            border-color: var(--primary);
+        }
+
+        .ai-chat-input-area button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 0.75rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+
+        .ai-chat-input-area button:hover {
+            background: var(--primary-hover);
+        }
+
+        .typing-indicator {
+            display: flex;
+            gap: 4px;
+            padding: 10px 15px;
+            background: var(--border);
+            border-radius: 15px;
+            align-self: flex-start;
+            width: fit-content;
+            margin-bottom: 5px;
+        }
+
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--text-muted);
+            border-radius: 50%;
+            animation: typingBounce 1s infinite ease-in-out;
+        }
+
+        .typing-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes typingBounce {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-4px);
+            }
+        }
+
+        @keyframes bubbleFadeIn {
+            from {
+                transform: translateY(10px) scale(0.96);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0) scale(1);
+                opacity: 1;
+            }
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+
+<body data-user-authenticated="{{ 'true' if session.get('user_id') else 'false' }}">
+
+    <nav class="navbar">
+        <a href="{{ url_for('home') }}" class="logo"><i class="fas fa-shopping-bag"></i> Smart Shopping</a>
+        <div class="nav-links">
+            <a href="{{ url_for('home') }}">Home</a>
+            <a href="{{ url_for('about') }}">About</a>
+            <a href="{{ url_for('contact') }}">Contact</a>
+
+            {% if session.get('user_id') %}
+            <a href="{{ url_for('dashboard') }}">Search</a>
+            <a href="{{ url_for('wishlist') }}"><i class="fas fa-heart"></i> Wishlist</a>
+            <a href="{{ url_for('my_alerts') }}" style="position: relative;"><i class="fas fa-bell"></i> Alerts</a>
+            <a href="{{ url_for('search_history') }}"><i class="fas fa-history"></i> History</a>
+            {% endif %}
+
+
+            {% if session.get('user_id') or session.get('admin_logged_in') %}
+            <a href="{{ url_for('logout') }}" class="btn-primary" style="padding: 8px 18px;">Logout</a>
+            {% else %}
+            <a href="{{ url_for('signin') }}" class="btn-primary" style="padding: 8px 18px;">Sign In</a>
+            {% endif %}
+
+            <button class="theme-toggle" id="themeToggle" title="Toggle Dark Mode">
+                <i class="fas fa-moon"></i>
+            </button>
+        </div>
+    </nav>
+
+    <div class="main-content">
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="flash-message {% if category == 'error' %}flash-error{% else %}flash-success{% endif %}">
+            {{ message }}
+        </div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </div>
+
+    <footer class="footer">
+        <div>
+            <h3 class="footer-logo">Smart Shopping</h3>
+            <p class="footer-text">A next-generation price comparison and market intelligence platform. Analyze
+                historical trends and discover the best deals across Daraz, Amazon, and eBay in real-time.</p>
+            <div class="social-links">
+                <a href="#"><i class="fab fa-facebook-f"></i></a>
+                <a href="#"><i class="fab fa-twitter"></i></a>
+                <a href="#"><i class="fab fa-instagram"></i></a>
+                <a href="#"><i class="fab fa-github"></i></a>
+            </div>
+        </div>
+
+        <div class="footer-links">
+            <h4>Quick Links</h4>
+            <ul>
+                <li><a href="{{ url_for('home') }}">Home</a></li>
+                <li><a href="{{ url_for('about') }}">About Us</a></li>
+                <li><a href="{{ url_for('contact') }}">Contact</a></li>
+                <li><a href="{{ url_for('signin') }}">Account</a></li>
+            </ul>
+        </div>
+
+        <div class="newsletter">
+            <h4>Stay Updated</h4>
+            <p style="font-size: 13px; margin-bottom: 15px;">Subscribe to get the latest deals directly in your inbox.
+            </p>
+            <form class="newsletter-form" action="#">
+                <input type="email" placeholder="Your email address" required>
+                <button type="submit">Subscribe</button>
+            </form>
+        </div>
+    </footer>
+
+    <!-- Floating AI Chatbot Advisor (Smarty) -->
+    <div class="ai-chat-launcher" id="aiChatLauncher" onclick="toggleAIChat()">
+        <i class="fas fa-robot"></i>
+        <div class="notification-dot" id="aiChatNotification" style="display: none;"></div>
+    </div>
+
+    <div class="ai-chat-window" id="aiChatWindow">
+        <div class="ai-chat-header">
+            <h4>🤖 Smarty - AI Shop Advisor</h4>
+            <button class="close-btn" onclick="toggleAIChat()"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="ai-chat-messages" id="aiChatMessages">
+            <div class="message-bubble bot">
+                👋 Hello! I am Smarty, your AI Shopping Advisor 🤖. How can I help you find sasta deals 💸 or compare
+                products 🛍️ today?
+            </div>
+        </div>
+        <div class="ai-chat-input-area">
+            <input type="text" id="aiChatInput" placeholder="Ask Smarty anything..."
+                onkeydown="handleChatKeyDown(event)">
+            <button onclick="sendAIChatMessage()"><i class="fas fa-paper-plane"></i></button>
+        </div>
+    </div>
+
+    {% block scripts %}{% endblock %}
+
+    <script>
+        // Theme Management
+        const themeToggle = document.getElementById('themeToggle');
+        const icon = themeToggle.querySelector('i');
+        const html = document.documentElement;
+
+        // Check for saved theme
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        html.setAttribute('data-theme', savedTheme);
+        updateIcon(savedTheme);
+
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateIcon(newTheme);
+        });
+
+        function updateIcon(theme) {
+            if (theme === 'dark') {
+                icon.classList.replace('fa-moon', 'fa-sun');
+            } else {
+                icon.classList.replace('fa-sun', 'fa-moon');
+            }
+        }
+
+        // AI Chatbot Operations
+        function toggleAIChat() {
+            const chatWindow = document.getElementById('aiChatWindow');
+            const notifDot = document.getElementById('aiChatNotification');
+            chatWindow.classList.toggle('open');
+            if (chatWindow.classList.contains('open')) {
+                notifDot.style.display = 'none';
+                document.getElementById('aiChatInput').focus();
+            }
+        }
+
+        function handleChatKeyDown(event) {
+            if (event.key === 'Enter') {
+                sendAIChatMessage();
+            }
+        }
+
+        function sendAIChatMessage() {
+            const input = document.getElementById('aiChatInput');
+            const message = input.value.trim();
+            if (!message) return;
+
+            // Clear input
+            input.value = '';
+
+            // Add user message bubble
+            appendChatMessage(message, 'user');
+
+            // Scroll to bottom
+            const msgArea = document.getElementById('aiChatMessages');
+            msgArea.scrollTop = msgArea.scrollHeight;
+
+            // Show typing indicator
+            const typingIndicator = showTypingIndicator();
+            msgArea.scrollTop = msgArea.scrollHeight;
+
+            // Send via fetch API to app backend
+            fetch('/api/ai_chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: message })
+            })
+                .then(res => res.json())
+                .then(data => {
+                    // Remove typing indicator
+                    if (typingIndicator) typingIndicator.remove();
+
+                    // Add bot message bubble
+                    appendChatMessage(data.response || "I didn't quite catch that. Try searching in the main query bar!", 'bot');
+                    msgArea.scrollTop = msgArea.scrollHeight;
+                })
+                .catch(err => {
+                    console.error("AI Chat error:", err);
+                    if (typingIndicator) typingIndicator.remove();
+                    appendChatMessage("Sorry, my AI engine is currently busy. Please try again soon!", 'bot');
+                    msgArea.scrollTop = msgArea.scrollHeight;
+                });
+        }
+
+        function appendChatMessage(text, sender) {
+            const msgArea = document.getElementById('aiChatMessages');
+            const bubble = document.createElement('div');
+            bubble.className = `message-bubble ${sender}`;
+            bubble.innerText = text;
+            msgArea.appendChild(bubble);
+        }
+
+        function showTypingIndicator() {
+            const msgArea = document.getElementById('aiChatMessages');
+            const indicator = document.createElement('div');
+            indicator.className = 'typing-indicator';
+            indicator.id = 'aiTypingIndicator';
+            indicator.innerHTML = `
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+            `;
+            msgArea.appendChild(indicator);
+            return indicator;
+        }
+
+        // Pulse the notification dot after 5 seconds on first load to draw attention
+        setTimeout(() => {
+            const chatWindow = document.getElementById('aiChatWindow');
+            if (chatWindow && !chatWindow.classList.contains('open')) {
+                const notifDot = document.getElementById('aiChatNotification');
+                if (notifDot) notifDot.style.display = 'block';
+            }
+        }, 5000);
+    </script>
+</body>
+
+</html>

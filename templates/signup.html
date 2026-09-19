@@ -1,0 +1,188 @@
+{% extends "base.html" %}
+
+{% block title %}Sign Up - Smart Shopping{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --auth-primary: #6366f1;
+        --auth-border: #e2e8f0;
+        --auth-text: #1e293b;
+        --auth-muted: #64748b;
+        --auth-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    }
+
+    body {
+        background-color: #f8fafc;
+    }
+
+    .auth-section {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 5rem 1rem;
+        min-height: calc(100vh - 200px);
+    }
+
+    .auth-card {
+        background: #ffffff;
+        padding: 3.5rem 3rem;
+        border-radius: 2.5rem;
+        box-shadow: var(--auth-shadow);
+        width: 100%;
+        max-width: 600px;
+        text-align: center;
+        border: 1px solid var(--auth-border);
+    }
+
+    .auth-card h2 {
+        font-size: 2.25rem;
+        font-weight: 800;
+        color: #1e3a8a;
+        /* Deep navy like in sample */
+        margin-bottom: 0.75rem;
+        letter-spacing: -0.025em;
+    }
+
+    .auth-card p {
+        color: var(--auth-muted);
+        font-size: 1rem;
+        margin-bottom: 3rem;
+    }
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+        text-align: left;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+        text-align: left;
+    }
+
+    .form-group label {
+        display: block;
+        font-size: 0.9rem;
+        font-weight: 700;
+        color: var(--auth-text);
+        margin-bottom: 0.6rem;
+    }
+
+    .form-group input {
+        width: 100%;
+        padding: 1rem 1.5rem;
+        border: 1.5px solid var(--auth-border);
+        border-radius: 1rem;
+        background: #fcfcfc;
+        color: var(--auth-text);
+        outline: none;
+        font-size: 0.95rem;
+        transition: all 0.2s ease;
+    }
+
+    .form-group input:focus {
+        border-color: var(--auth-primary);
+        background: #fff;
+        box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+    }
+
+    .form-group input::placeholder {
+        color: #cbd5e1;
+    }
+
+    .btn-submit {
+        width: 100%;
+        background: var(--auth-primary);
+        color: white;
+        border: none;
+        padding: 1.1rem;
+        border-radius: 1rem;
+        font-size: 1rem;
+        font-weight: 800;
+        cursor: pointer;
+        margin-top: 1.5rem;
+        box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.4);
+        transition: all 0.2s ease;
+    }
+
+    .btn-submit:hover {
+        background: #4f46e5;
+        transform: translateY(-2px);
+        box-shadow: 0 15px 20px -5px rgba(99, 102, 241, 0.5);
+    }
+
+    .auth-footer {
+        margin-top: 2.5rem;
+        font-size: 0.95rem;
+        color: var(--auth-muted);
+    }
+
+    .auth-footer a {
+        color: var(--auth-primary);
+        font-weight: 700;
+        text-decoration: none;
+        margin-left: 0.25rem;
+    }
+
+    .auth-footer a:hover {
+        text-decoration: underline;
+    }
+
+    @media (max-width: 640px) {
+        .form-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .auth-card {
+            padding: 2.5rem 1.5rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="auth-section">
+    <div class="auth-card">
+        <h2>Join Smart Shopping</h2>
+        <p>Create an account to save deals and track prices</p>
+
+        <form action="{{ url_for('signup') }}" method="POST">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>First Name</label>
+                    <input type="text" name="first_name" required placeholder="John">
+                </div>
+                <div class="form-group">
+                    <label>Last Name</label>
+                    <input type="text" name="last_name" required placeholder="Doe">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Email Address</label>
+                <input type="email" name="email" required placeholder="john@example.com">
+            </div>
+
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" name="password" required placeholder="••••••••">
+            </div>
+
+            <div class="form-group">
+                <label>Confirm Password</label>
+                <input type="password" name="confirm_password" required placeholder="••••••••">
+            </div>
+
+            <button type="submit" class="btn-submit">
+                Create Account
+            </button>
+
+            <div class="auth-footer">
+                Already have an account? <a href="{{ url_for('signin') }}">Sign in here</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

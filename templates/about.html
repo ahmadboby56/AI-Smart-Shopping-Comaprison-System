@@ -1,0 +1,373 @@
+{% extends "base.html" %}
+
+{% block title %}Our Story - Smart Shopping{% endblock %}
+
+{% block extra_css %}
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800;900&display=swap');
+
+    :root {
+        --glass-bg: rgba(255, 255, 255, 0.03);
+        --glass-border: rgba(255, 255, 255, 0.1);
+        --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
+    }
+
+    [data-theme="light"] :root {
+        --glass-bg: rgba(255, 255, 255, 0.7);
+        --glass-border: rgba(255, 255, 255, 0.4);
+        --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+    }
+
+    body {
+        overflow-x: hidden;
+        font-family: 'Inter', sans-serif;
+    }
+
+    h1,
+    h2,
+    h3,
+    .stat-value {
+        font-family: 'Outfit', sans-serif;
+    }
+
+    /* Animated Background */
+    .bg-animation {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+        background: var(--bg-main);
+        overflow: hidden;
+    }
+
+    .blob {
+        position: absolute;
+        width: 800px;
+        height: 800px;
+        background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(168, 85, 247, 0.2));
+        filter: blur(120px);
+        border-radius: 50%;
+        animation: float 30s infinite alternate;
+    }
+
+    .blob-2 {
+        right: -200px;
+        top: -200px;
+        background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(59, 130, 246, 0.15));
+        animation-delay: -10s;
+    }
+
+    @keyframes float {
+        0% {
+            transform: translate(0, 0) scale(1);
+        }
+
+        100% {
+            transform: translate(200px, 100px) scale(1.2);
+        }
+    }
+
+    .about-container {
+        max-width: 1300px;
+        margin: 0 auto;
+        padding: 6rem 2rem 10rem;
+    }
+
+    /* Hero Section */
+    .about-hero {
+        position: relative;
+        border-radius: 3rem;
+        overflow: hidden;
+        margin-bottom: 8rem;
+        min-height: 700px;
+        display: flex;
+        align-items: center;
+        background: linear-gradient(135deg, #1e1b4b, #312e81);
+        box-shadow: 0 40px 100px -20px rgba(0, 0, 0, 0.5);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .hero-content {
+        padding: 6rem;
+        width: 100%;
+        max-width: 800px;
+        z-index: 2;
+        color: white;
+    }
+
+    .hero-content h1 {
+        font-size: 5.5rem;
+        line-height: 0.9;
+        margin-bottom: 2rem;
+        font-weight: 900;
+        letter-spacing: -0.06em;
+        background: linear-gradient(to bottom, #ffffff, #cbd5e1);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .hero-content p {
+        font-size: 1.4rem;
+        opacity: 0.9;
+        line-height: 1.6;
+        margin-bottom: 3.5rem;
+        font-weight: 500;
+    }
+
+    .hero-image {
+        position: absolute;
+        right: 0;
+        top: 0;
+        width: 60%;
+        height: 100%;
+        object-fit: cover;
+        opacity: 0.7;
+        mask-image: linear-gradient(to left, black 60%, transparent);
+        -webkit-mask-image: linear-gradient(to left, black 60%, transparent);
+    }
+
+    /* Grid Layout */
+    .about-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 3rem;
+    }
+
+    @media (max-width: 1024px) {
+        .hero-content h1 {
+            font-size: 4rem;
+        }
+
+        .about-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .about-hero {
+            flex-direction: column;
+            text-align: center;
+            padding: 4rem 2rem;
+            min-height: auto;
+        }
+
+        .hero-content {
+            padding: 0;
+        }
+
+        .hero-image {
+            position: relative;
+            width: 100%;
+            height: 300px;
+            mask-image: none;
+            -webkit-mask-image: none;
+            margin-top: 3rem;
+            border-radius: 2rem;
+        }
+
+        .stats-row {
+            justify-content: center;
+        }
+    }
+
+    /* Glass Cards */
+    .glass-card {
+        background: var(--glass-bg);
+        backdrop-filter: blur(24px);
+        -webkit-backdrop-filter: blur(24px);
+        border: 1px solid var(--glass-border);
+        border-radius: 2.5rem;
+        padding: 4rem;
+        box-shadow: var(--glass-shadow);
+        transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .glass-card::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(circle at top right, rgba(255, 255, 255, 0.1), transparent 70%);
+        opacity: 0;
+        transition: opacity 0.5s ease;
+    }
+
+    .glass-card:hover {
+        transform: translateY(-15px);
+        border-color: rgba(99, 102, 241, 0.4);
+        box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.3);
+    }
+
+    .glass-card:hover::before {
+        opacity: 1;
+    }
+
+    .icon-wrapper {
+        width: 70px;
+        height: 70px;
+        background: linear-gradient(135deg, var(--primary), #818cf8);
+        border-radius: 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.75rem;
+        box-shadow: 0 15px 30px -10px rgba(99, 102, 241, 0.5);
+    }
+
+    .glass-card h2 {
+        font-size: 2.2rem;
+        font-weight: 800;
+        color: var(--text-main);
+        letter-spacing: -0.02em;
+    }
+
+    .glass-card p {
+        color: var(--text-muted);
+        line-height: 1.7;
+        font-size: 1.15rem;
+    }
+
+    .tech-stack {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+
+    .tech-tag {
+        background: rgba(99, 102, 241, 0.08);
+        color: var(--primary);
+        padding: 0.6rem 1.4rem;
+        border-radius: 1rem;
+        font-size: 0.9rem;
+        font-weight: 700;
+        border: 1px solid rgba(99, 102, 241, 0.1);
+        transition: all 0.3s ease;
+    }
+
+    .tech-tag:hover {
+        background: var(--primary);
+        color: white;
+        transform: translateY(-3px);
+    }
+
+    /* Stats Row */
+    .stats-row {
+        display: flex;
+        gap: 4rem;
+        margin-top: 3rem;
+    }
+
+    .stat-item {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .stat-value {
+        font-size: 3.5rem;
+        font-weight: 900;
+        background: linear-gradient(to bottom, #ffffff, #94a3b8);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        line-height: 1;
+    }
+
+    .stat-label {
+        font-size: 0.85rem;
+        color: #94a3b8;
+        text-transform: uppercase;
+        letter-spacing: 0.15em;
+        font-weight: 700;
+        margin-top: 0.5rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="bg-animation">
+    <div class="blob"></div>
+    <div class="blob blob-2"></div>
+</div>
+
+<div class="about-container">
+    <!-- Hero Section: Refined Text-Centric Design -->
+    <div class="about-hero"
+        style="justify-content: center; text-align: center; background: none; box-shadow: none; border: none; min-height: 500px;">
+        <div class="hero-content" style="max-width: 900px; padding: 0;">
+            <h1
+                style="background: linear-gradient(to right, var(--text-main), #818cf8); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">
+                Smarter Decisions.<br>Faster Results.</h1>
+            <p style="color: var(--text-muted); text-shadow: none; opacity: 1;">Architecting the most intelligent
+                e-commerce ecosystem in Pakistan. We bridge the gap between complexity and clarity, providing real-time
+                parity across the global marketplace.</p>
+            <div class="stats-row" style="justify-content: center;">
+                <div class="stat-item">
+                    <span class="stat-value">01</span>
+                    <span class="stat-label">The Vision</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value">02</span>
+                    <span class="stat-label">The Engine</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value">03</span>
+                    <span class="stat-label">The Impact</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Features Grid: Professional Modular Layout -->
+    <div class="about-grid">
+        <div class="glass-card">
+            <div class="icon-wrapper">
+                <i class="fas fa-microchip"></i>
+            </div>
+            <h2>Engineering Excellence</h2>
+            <p>Our infrastructure is built on high-performance asynchronous logic. We optimize for sub-millisecond data
+                retrieval, ensuring that the price you see is the absolute truth of the moment.</p>
+            <div class="tech-stack">
+                <span class="tech-tag">Asynchronous Logic</span>
+                <span class="tech-tag">Distributed Scraping</span>
+                <span class="tech-tag">Low-Latency API</span>
+            </div>
+        </div>
+
+        <div class="glass-card">
+            <div class="icon-wrapper" style="background: linear-gradient(135deg, #1e293b, #475569);">
+                <i class="fas fa-shield-alt"></i>
+            </div>
+            <h2>Integrity & Transparency</h2>
+            <p>We operate with a philosophy of absolute transparency. Our algorithms are designed to eliminate bias,
+                providing a level playing field for both consumers and vendors within the digital economy.</p>
+        </div>
+
+        <div class="glass-card">
+            <div class="icon-wrapper" style="background: linear-gradient(135deg, #818cf8, #4f46e5);">
+                <i class="fas fa-globe-asia"></i>
+            </div>
+            <h2>Localized Intelligence</h2>
+            <p>While we pull data from global leaders like Amazon and eBay, our core is deeply rooted in the Pakistani
+                market, understanding the unique nuances of Daraz and local vendors.</p>
+        </div>
+
+        <div class="glass-card">
+            <div class="icon-wrapper" style="background: linear-gradient(135deg, #0f172a, #334155);">
+                <i class="fas fa-layer-group"></i>
+            </div>
+            <h2>The Unified Core</h2>
+            <p>Beyond price comparison, we are building a unified core for product discovery. A single entry point for
+                everything, powered by sophisticated Natural Language Processing.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

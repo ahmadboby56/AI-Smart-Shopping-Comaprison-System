@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Smart Shopping - IISAT × InnoVista AI Summit '26 Executive Documentation</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap');
+
+        @page {
+            size: A4;
+            margin: 10mm 12mm 10mm 12mm;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            color: #0f172a;
+            background-color: #ffffff;
+            font-size: 9.5pt;
+            line-height: 1.45;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        .page {
+            width: 100%;
+            height: 275mm;
+            max-height: 275mm;
+            overflow: hidden;
+            page-break-after: always;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding-bottom: 2mm;
+        }
+
+        .page:last-child {
+            page-break-after: avoid;
+        }
+
+        /* Header Banner */
+        .header {
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #312e81 100%);
+            color: #ffffff;
+            padding: 14px 20px;
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            border-bottom: 3px solid #6366f1;
+            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15);
+        }
+
+        .header-left h1 {
+            font-size: 16pt;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .header-left p {
+            font-size: 8.5pt;
+            color: #c7d2fe;
+            margin-top: 2px;
+            font-weight: 500;
+        }
+
+        .header-badge {
+            background: rgba(99, 102, 241, 0.25);
+            border: 1px solid #818cf8;
+            color: #e0e7ff;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 8.5pt;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            text-align: right;
+        }
+
+        /* Section Styling */
+        .section-title {
+            font-size: 11pt;
+            font-weight: 700;
+            color: #1e1b4b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-left: 4px solid #6366f1;
+            padding-left: 8px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .card {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 10px 12px;
+            position: relative;
+        }
+
+        .card-accent {
+            border-top: 3px solid #6366f1;
+        }
+
+        .card-accent-emerald {
+            border-top: 3px solid #10b981;
+        }
+
+        .card-accent-amber {
+            border-top: 3px solid #f59e0b;
+        }
+
+        .card h3 {
+            font-size: 9.5pt;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 4px;
+        }
+
+        .card p {
+            font-size: 8.5pt;
+            color: #334155;
+            line-height: 1.4;
+        }
+
+        .pill {
+            display: inline-block;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 7.5pt;
+            background: #e0e7ff;
+            color: #3730a3;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+
+        /* Diagram Box */
+        .architecture-box {
+            background: #0f172a;
+            color: #f8fafc;
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+
+        .flow-steps {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .flow-node {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 6px;
+            padding: 6px 8px;
+            text-align: center;
+            flex: 1;
+        }
+
+        .flow-node h4 {
+            font-size: 8pt;
+            color: #38bdf8;
+            font-weight: 700;
+        }
+
+        .flow-node p {
+            font-size: 7pt;
+            color: #94a3b8;
+        }
+
+        .flow-arrow {
+            color: #818cf8;
+            font-weight: 800;
+            font-size: 10pt;
+        }
+
+        /* Table */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 10px;
+            font-size: 8.2pt;
+        }
+
+        th,
+        td {
+            padding: 6px 8px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        th {
+            background-color: #f1f5f9;
+            color: #1e293b;
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 7.5pt;
+            letter-spacing: 0.3px;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f8fafc;
+        }
+
+        /* Tech Badges */
+        .tech-stack {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 6px;
+        }
+
+        .tech-tag {
+            background: #f1f5f9;
+            border: 1px solid #cbd5e1;
+            color: #334155;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 7.8pt;
+            font-weight: 600;
+        }
+
+        /* Highlight box */
+        .highlight-box {
+            background: #eff6ff;
+            border: 1px dashed #3b82f6;
+            border-radius: 8px;
+            padding: 8px 12px;
+            margin-bottom: 10px;
+        }
+
+        .highlight-box h4 {
+            font-size: 9pt;
+            color: #1d4ed8;
+            font-weight: 700;
+            margin-bottom: 2px;
+        }
+
+        .highlight-box p {
+            font-size: 8pt;
+            color: #1e40af;
+        }
+
+        /* Footer */
+        .footer {
+            border-top: 1px solid #cbd5e1;
+            padding-top: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 7.5pt;
+            color: #64748b;
+        }
+
+        .footer strong {
+            color: #1e1b4b;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- PAGE 1 -->
+    <div class="page">
+        <div>
+            <!-- Official Header Banner -->
+            <div class="header">
+                <div class="header-left">
+                    <h1>🛒 Smart Shopping AI Engine</h1>
+                    <p>Multi-Source E-Commerce Aggregator & Voice AI Price Comparison Platform</p>
+                </div>
+                <div class="header-badge">
+                    IISAT × InnoVista AI Summit ’26<br>
+                    <span style="font-size:7pt; opacity:0.9;">Shortlisted Project Submission</span>
+                </div>
+            </div>
+
+            <!-- Executive Abstract -->
+            <div class="highlight-box">
+                <h4>📌 Executive Project Overview</h4>
+                <p>
+                    <strong>Smart Shopping</strong> is an intelligent, full-stack e-commerce aggregation and
+                    voice-assisted decision engine.
+                    It unifies product listings across <strong>10+ major online marketplaces</strong> (Daraz.pk,
+                    PriceOye, Telemart, Mega.pk, Ubuy, Amazon, etc.)
+                    in real time. Powered by multi-accent acoustic speech recognition, backend Levenshtein fuzzy string
+                    resolution, and TextBlob NLP sentiment analysis,
+                    Smart Shopping empowers users to discover transparent pricing, evaluate seller credibility, track
+                    historical price volatility, and save time & money.
+                </p>
+            </div>
+
+            <!-- Core AI Innovations -->
+            <div class="section-title">
+                <span>🚀 Core AI & Technical Innovations</span>
+                <span style="font-size:7.5pt; color:#6366f1; font-weight:600;">Technical Deep-Dive</span>
+            </div>
+
+            <div class="grid-3">
+                <div class="card card-accent">
+                    <h3>🎙️ Multi-Accent Voice AI</h3>
+                    <p>
+                        Integrates Web Speech API with dynamic browser locale detection (<span
+                            class="pill">navigator.language</span>)
+                        and multi-alternative evaluation (<span class="pill">maxAlternatives=5</span>). Accurately
+                        transcribes South Asian,
+                        Middle Eastern, and Western English accents.
+                    </p>
+                </div>
+                <div class="card card-accent-emerald">
+                    <h3>🔤 Levenshtein Fuzzy Search</h3>
+                    <p>
+                        Backend fault-tolerance powered by Python's <span class="pill">difflib</span>. Automatically
+                        resolves voice transcription errors
+                        or phonetic typos (e.g. <em>"airburds"</em> &rarr; <em>"AirPods Pro"</em>), ensuring zero
+                        zero-result search failures.
+                    </p>
+                </div>
+                <div class="card card-accent-amber">
+                    <h3>🛡️ NLP Merchant Trust Rating</h3>
+                    <p>
+                        Evaluates seller review sentiment via <span class="pill">TextBlob</span>, price volatility
+                        ratios, return policy terms, and return rate metrics
+                        to compute an automated <strong>0–100 Trust Score</strong> badge per product.
+                    </p>
+                </div>
+            </div>
+
+            <!-- System Architecture & Flowchart -->
+            <div class="section-title">
+                <span>🏗️ System Architecture & Data Pipeline</span>
+            </div>
+
+            <div class="architecture-box">
+                <div class="flow-steps">
+                    <div class="flow-node">
+                        <h4>1. Client Layer</h4>
+                        <p>Voice / Web Query<br>(Glassmorphic UI)</p>
+                    </div>
+                    <div class="flow-arrow">&rarr;</div>
+                    <div class="flow-node">
+                        <h4>2. Flask Backend</h4>
+                        <p>Phoneme & Fuzzy Engine<br><span style="color:#a7f3d0">difflib + TextBlob</span></p>
+                    </div>
+                    <div class="flow-arrow">&rarr;</div>
+                    <div class="flow-node">
+                        <h4>3. Web Scraping Pipeline</h4>
+                        <p>Concurrent Scraping<br>10+ Online Marketplaces</p>
+                    </div>
+                    <div class="flow-arrow">&rarr;</div>
+                    <div class="flow-node">
+                        <h4>4. Analytics & Storage</h4>
+                        <p>SQLite Time-Series<br>Price Tracking & Alerts</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Technical Specification Matrix -->
+            <div class="section-title">
+                <span>🛠️ Technology Stack & Core Modules</span>
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Subsystem / Module</th>
+                        <th>Core Technology</th>
+                        <th>Functional Purpose</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Web Backend & API</strong></td>
+                        <td>Python 3.10, Flask 3.0, Gunicorn</td>
+                        <td>RESTful endpoints, session management, server-side CORS proxying</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Voice Recognition</strong></td>
+                        <td>Web Speech API, Locale Adaptation</td>
+                        <td>Hands-free voice querying with South Asian accent phonetic mapping</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Multi-Source Scraper</strong></td>
+                        <td>BeautifulSoup4, Requests, ThreadPool</td>
+                        <td>Parallelized scraping of prices, images, ratings from 10+ platforms</td>
+                    </tr>
+                    <tr>
+                        <td><strong>NLP Sentiment Engine</strong></td>
+                        <td>TextBlob NLP Library</td>
+                        <td>Polarity & subjectivity extraction to grade seller review credibility</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Data Storage & Analytics</strong></td>
+                        <td>SQLite3, Chart.js</td>
+                        <td>Historical price logging, trend visualization, and volume analytics</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Page 1 Footer -->
+        <div class="footer">
+            <div>Project: <strong>Smart Shopping Engine</strong> | IISAT × InnoVista AI Summit '26</div>
+            <div>Page 1 of 2</div>
+        </div>
+    </div>
+
+    <!-- PAGE 2 -->
+    <div class="page">
+        <div>
+            <!-- Header Page 2 -->
+            <div class="header" style="padding: 10px 16px; margin-bottom: 10px;">
+                <div class="header-left">
+                    <h1 style="font-size:13pt;">🛒 Smart Shopping — Detailed Features & Business Impact</h1>
+                </div>
+                <div class="header-badge" style="padding:4px 8px; font-size:7.5pt;">
+                    Submission Document — Page 2
+                </div>
+            </div>
+
+            <!-- Market Integration & Capabilities -->
+            <div class="section-title">
+                <span>🌐 Marketplace Coverage & Aggregation Engine</span>
+            </div>
+
+            <div class="grid-2">
+                <div class="card">
+                    <h3>🛍️ Supported E-Commerce Marketplaces</h3>
+                    <p>
+                        Scrapes and aggregates live listings from <strong>Daraz.pk, PriceOye, Telemart, Mega.pk,
+                            Surmawala, Ubuy, Shophive, Clicky, Amazon, and eBay</strong>.
+                        Built-in request retries and header rotation prevent IP rate-limiting.
+                    </p>
+                </div>
+                <div class="card">
+                    <h3>📈 Price Volatility & Alert Notification</h3>
+                    <p>
+                        Tracks every product query in SQLite time-series logs. Interactive <strong>Chart.js</strong>
+                        graphs display 7-day and 30-day price trends,
+                        alerting users when a item reaches its historical lowest price point.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Admin Control & Monetization -->
+            <div class="section-title">
+                <span>💼 Monetization Model & Admin Analytics</span>
+            </div>
+
+            <div class="grid-2">
+                <div class="card card-accent-emerald">
+                    <h3>💰 Affiliate Revenue Model</h3>
+                    <p>
+                        Outbound merchant clicks embed dynamic tracking parameters. The platform calculates estimated
+                        affiliate revenue (standard 3% baseline commission)
+                        per converted redirect click to demonstrate commercial sustainability.
+                    </p>
+                </div>
+                <div class="card card-accent">
+                    <h3>📊 Administrative Monitoring Dashboard</h3>
+                    <p>
+                        Secured portal (<span class="pill">/admin-login</span>) providing real-time tracking of top
+                        searched keywords, conversion metrics,
+                        scraping latency logs, and user search volume distributions across categories.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Impact for AI Summit '26 -->
+            <div class="section-title">
+                <span>🏆 IISAT × InnoVista AI Summit '26 Impact Statement</span>
+            </div>
+
+            <div class="highlight-box" style="background:#f0fdf4; border-color:#22c55e;">
+                <h4 style="color:#15803d;">🌟 Key Market Value & Innovation Highlights</h4>
+                <ul style="margin-left:16px; font-size:8pt; color:#166534; line-height:1.5;">
+                    <li><strong>Democratizing E-Commerce in Emerging Markets:</strong> Solves price opacity and
+                        fragmented product availability across local South Asian retail platforms.</li>
+                    <li><strong>Accessibility via Voice AI:</strong> Enables voice-based search for non-fluent or
+                        non-typing users with natural multi-accent phoneme handling.</li>
+                    <li><strong>AI-Driven Consumer Protection:</strong> Protects consumers from fake reviews and
+                        inflated "discounted" prices through NLP Trust Scores and historical price trend validation.
+                    </li>
+                    <li><strong>High Scalability:</strong> Lightweight Python micro-architecture deployable on cloud
+                        containers (Render/Docker) with sub-second aggregate responses.</li>
+                </ul>
+            </div>
+
+            <!-- Project & Team Details -->
+            <div class="section-title">
+                <span>👥 Team & Submission Information</span>
+            </div>
+
+            <div class="card" style="background:#f8fafc; border:1px solid #cbd5e1; padding:10px;">
+                <div class="grid-2" style="margin-bottom:0; gap:16px;">
+                    <div>
+                        <p><strong>Project Name:</strong> Smart Shopping Platform</p>
+                        <p><strong>Category:</strong> Artificial Intelligence & Full-Stack Web Systems</p>
+                        <p><strong>Summit Event:</strong> IISAT × InnoVista AI Summit ’26</p>
+                    </div>
+                    <div>
+                        <p><strong>Contact Email:</strong> <a href="mailto:malaika.pasha@iisat.edu.pk"
+                                style="color:#4f46e5; text-decoration:none;">malaika.pasha@iisat.edu.pk</a></p>
+                        <p><strong>Status:</strong> Shortlisted Finalist Group</p>
+                        <p><strong>Submission Package:</strong> 2-Page Executive Doc + Screen Recording Demo</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Page 2 Footer -->
+        <div class="footer">
+            <div>Submitted to: <strong>Ms. Malaika Pasha (PMO), IISAT × InnoVista AI Summit ’26</strong></div>
+            <div>Page 2 of 2</div>
+        </div>
+    </div>
+
+</body>
+
+</html>
