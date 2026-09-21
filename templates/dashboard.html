@@ -752,46 +752,7 @@
         margin-right: auto;
     }
 
-    .hero-search {
-        display: flex;
-        max-width: 800px;
-        margin: 0 auto;
-        background: var(--white);
-        padding: 0.5rem;
-        border-radius: 9999px;
-        box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1);
-    }
-
-    [data-theme="dark"] .hero-search {
-        background: #1e293b;
-        border: 1px solid #334155;
-    }
-
-    .hero-search input {
-        flex: 1;
-        padding: 1rem 2rem;
-        border: none;
-        outline: none;
-        font-size: 1.1rem;
-        background: transparent;
-        color: var(--text-main);
-    }
-
-    .hero-search button {
-        background: var(--primary);
-        color: white;
-        border: none;
-        padding: 0 2.5rem;
-        border-radius: 9999px;
-        font-weight: 700;
-        cursor: pointer;
-        transition: var(--transition);
-    }
-
-    .hero-search button:hover {
-        background: var(--primary-hover);
-        transform: scale(1.05);
-    }
+    /* Section Header */
 
     .section-header {
         text-align: left;
@@ -813,11 +774,11 @@
         background: var(--border);
     }
 
-    /* Featured Grid */
+    /* Featured Grid - Exactly 4 items in 1 line on desktop */
     .featured-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-        gap: 2rem;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1.5rem;
         margin-bottom: 4rem;
     }
 
@@ -857,11 +818,11 @@
         margin-top: auto;
     }
 
-    /* Category Grid */
+    /* Category Grid - Exactly 4 items in 1 line on desktop */
     .categories-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-        gap: 2rem;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1.5rem;
         margin-bottom: 5rem;
     }
 
@@ -919,46 +880,243 @@
         border-color: var(--primary);
     }
 
-    .visual-search-btn {
-        background: var(--bg-body);
-        border: 1px solid var(--border);
-        border-left: none;
-        padding: 0 1.5rem;
+    .hero-search {
         display: flex;
         align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        transition: var(--transition);
-        color: var(--text-muted);
-        border-radius: 0 9999px 9999px 0;
-        font-size: 1.2rem;
+        justify-content: space-between;
+        width: 100%;
+        max-width: 750px;
+        margin: 1.5rem auto 0 auto;
+        background: #ffffff;
+        border-radius: 9999px;
+        padding: 0.35rem 0.5rem 0.35rem 1.5rem;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        position: relative;
     }
 
-    .visual-search-btn:hover {
-        color: var(--primary);
-        background: var(--bg-card);
+    [data-theme="dark"] .hero-search {
+        background: #1e293b;
     }
 
-    .visual-search-preview {
-        position: absolute;
-        bottom: -60px;
-        left: 20px;
-        background: var(--bg-card);
-        padding: 5px;
-        border-radius: 8px;
-        box-shadow: var(--shadow);
-        display: none;
+    .hero-search input {
+        flex: 1 !important;
+        border: none !important;
+        outline: none !important;
+        background: transparent !important;
+        color: #0f172a !important;
+        font-size: 1rem !important;
+        padding: 0.6rem 0.5rem !important;
+        min-width: 0 !important;
+        box-shadow: none !important;
+    }
+
+    [data-theme="dark"] .hero-search input {
+        color: #f8fafc !important;
+    }
+
+    .hero-controls {
+        display: flex;
         align-items: center;
-        gap: 10px;
-        z-index: 100;
-        border: 1px solid var(--primary);
+        gap: 0.5rem;
+        flex-shrink: 0;
     }
 
-    .visual-search-preview img {
-        width: 40px;
-        height: 40px;
-        object-fit: cover;
-        border-radius: 4px;
+    .voice-btn {
+        background: #6366f1 !important;
+        color: #ffffff !important;
+        border: none !important;
+        padding: 0.6rem 1.25rem !important;
+        border-radius: 0.6rem !important;
+        cursor: pointer !important;
+        font-size: 1rem !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        transition: all 0.2s ease !important;
+    }
+
+    .voice-btn:hover {
+        background: #4f46e5 !important;
+    }
+
+    .camera-btn {
+        background: #f1f5f9 !important;
+        color: #475569 !important;
+        border: 1px solid #cbd5e1 !important;
+        width: 40px !important;
+        height: 40px !important;
+        border-radius: 0.6rem !important;
+        cursor: pointer !important;
+        font-size: 1.1rem !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        transition: all 0.2s ease !important;
+    }
+
+    .camera-btn:hover {
+        background: #e2e8f0 !important;
+        color: #1e293b !important;
+    }
+
+    .hero-submit-btn {
+        background: #6366f1 !important;
+        color: #ffffff !important;
+        border: none !important;
+        padding: 0.75rem 1.5rem !important;
+        border-radius: 9999px !important;
+        font-weight: 600 !important;
+        font-size: 0.95rem !important;
+        cursor: pointer !important;
+        box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3) !important;
+        transition: all 0.2s ease !important;
+        white-space: nowrap !important;
+    }
+
+    .hero-submit-btn:hover {
+        background: #4f46e5 !important;
+    }
+
+    @media (max-width: 768px) {
+        .hero-search {
+            flex-direction: column !important;
+            border-radius: 1.25rem !important;
+            padding: 0.75rem !important;
+            gap: 0.75rem !important;
+            align-items: stretch !important;
+        }
+
+        .hero-controls {
+            width: 100% !important;
+            justify-content: space-between !important;
+        }
+
+        .voice-btn,
+        .camera-btn {
+            flex: 1 !important;
+        }
+
+        .hero-submit-btn {
+            width: 100% !important;
+            border-radius: 0.75rem !important;
+            text-align: center !important;
+        }
+    }
+
+    .results-toolbar {
+        padding: 1rem;
+        border-radius: 1rem;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 1rem;
+    }
+
+    .filter-section {
+        padding: 1rem;
+        border-radius: 1rem;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 1rem;
+    }
+
+    .price-inputs {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .price-inputs input {
+        flex: 1;
+        width: auto;
+    }
+
+    .store-filters {
+        gap: 0.5rem;
+    }
+
+    .store-checkbox {
+        padding: 0.4rem 0.75rem;
+        font-size: 0.8rem;
+    }
+
+    .btn-reset-filters {
+        width: 100%;
+        margin-left: 0;
+        text-align: center;
+    }
+
+    .results-grid {
+        grid-template-columns: 1fr !important;
+        gap: 1.25rem;
+    }
+
+    .skeleton-grid {
+        grid-template-columns: 1fr !important;
+        gap: 1.25rem;
+    }
+
+    .product-card {
+        min-height: auto;
+        border-radius: 1rem;
+    }
+
+    .img-container {
+        height: 180px;
+        padding: 1rem;
+    }
+
+    .card-body {
+        padding: 1rem;
+    }
+
+    .card-title {
+        font-size: 0.95rem;
+        height: 2.6rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .card-price {
+        font-size: 1.15rem;
+        margin-bottom: 1rem;
+    }
+
+    .card-actions {
+        grid-template-columns: 1fr;
+        gap: 0.5rem;
+    }
+
+    .btn-view-deal,
+    .btn-outline {
+        padding: 0.65rem;
+        font-size: 0.8rem;
+        width: 100%;
+    }
+
+    .compare-bar {
+        width: calc(100% - 2rem);
+        padding: 0.75rem 1rem;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 0.75rem;
+        border-radius: 1rem;
+    }
+
+    .compare-table th,
+    .compare-table td {
+        padding: 0.5rem;
+        font-size: 0.8rem;
+    }
+
+    .featured-grid,
+    .categories-grid {
+        grid-template-columns: 1fr !important;
+        gap: 1.25rem;
+    }
+
+    .modal-content {
+        padding: 1.5rem 1rem;
+        border-radius: 1rem;
+        max-height: 90vh;
+        overflow-y: auto;
     }
 </style>
 {% endblock %}
@@ -971,23 +1129,19 @@
         <h1>Smart Shopping </h1>
         <p>Compare prices from Daraz, Amazon, and eBay in one place and save time and get discount</p>
         <form class="hero-search" action="{{ url_for('dashboard') }}" method="GET" id="inlineSearch">
-            <div style="flex: 1; position: relative;">
-                <div style="display: flex; align-items: center;">
-                    <input type="text" name="q" id="searchInput" placeholder="What are you looking for today?" required
-                        autocomplete="off" style="width: 100%; border-radius: 9999px 0 0 9999px;">
-                    <button type="button" id="voiceSearchBtn" class="visual-search-btn" title="Search by Voice"
-                        style="border-left: 1px solid var(--border); border-right: none; border-radius: 0; height: 50px;">
-                        <i class="fas fa-microphone" id="voiceSearchIcon"></i>
-                    </button>
-                    <label for="visualSearchInput" class="visual-search-btn" title="Search by Image"
-                        style="height: 50px;">
-                        <i class="fas fa-camera"></i>
-                        <input type="file" id="visualSearchInput" accept="image/*" style="display: none;">
-                    </label>
-                </div>
-                <div id="suggestionsBox" class="autocomplete-suggestions"></div>
+            <input type="text" name="q" id="searchInput" placeholder="What are you looking for today?" required
+                autocomplete="off">
+            <div class="hero-controls">
+                <button type="button" id="voiceSearchBtn" class="voice-btn" title="Search by Voice">
+                    <i class="fas fa-microphone" id="voiceSearchIcon"></i>
+                </button>
+                <label for="visualSearchInput" class="camera-btn" title="Search by Image">
+                    <i class="fas fa-camera"></i>
+                    <input type="file" id="visualSearchInput" accept="image/*" style="display: none;">
+                </label>
+                <button type="submit" class="hero-submit-btn" onclick="showLoading()">Search Now</button>
             </div>
-            <button type="submit" onclick="showLoading()">Search Now</button>
+            <div id="suggestionsBox" class="autocomplete-suggestions"></div>
         </form>
     </div>
 </div>
@@ -1002,8 +1156,7 @@
     <a href="{{ url_for('redirect_store', url=product.url, store=product.source, title=product.name, price=product.price) }}"
         target="_blank" class="featured-card">
         <img src="{{ product.image if product.image.startswith('/static') else '/api/proxy_image?url=' + product.image }}"
-            onerror="this.onerror=null;this.src='https://via.placeholder.com/200?text={{ product.name[:10] | urlencode }}';"
-            alt="{{ product.name }}">
+            onerror="this.onerror=null;this.src='/static/images/iisat_logo.jpg';" alt="{{ product.name }}">
         <div
             style="font-weight:600; font-size: 1rem; margin-bottom: 0.5rem; height: 3rem; overflow: hidden; color: var(--text-main);">
             {{ product.name }}
