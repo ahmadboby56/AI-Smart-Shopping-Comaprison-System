@@ -1,5 +1,3 @@
-from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
 from bs4 import BeautifulSoup
 import time
 import re
@@ -7,19 +5,36 @@ import requests
 import concurrent.futures
 import threading
 from apify_client import ApifyClient
-import undetected_chromedriver as uc
 import cloudscraper
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
 import random
 import os
 import logging
 import json
 from urllib.parse import urljoin
+
+# Cloud-safe optional Selenium imports
+try:
+    from selenium import webdriver
+    from selenium.webdriver.chrome.options import Options
+    from selenium.webdriver.common.by import By
+    from selenium.webdriver.support.ui import WebDriverWait
+    from selenium.webdriver.support import expected_conditions as EC
+    HAS_SELENIUM = True
+except Exception:
+    HAS_SELENIUM = False
+    webdriver = None
+    Options = None
+    By = None
+    WebDriverWait = None
+    EC = None
+
+try:
+    import undetected_chromedriver as uc
+    HAS_UC = True
+except Exception:
+    HAS_UC = False
+    uc = None
+
 
 # Setup Logging
 SCRAPER_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -83,7 +98,11 @@ def get_session():
 # DRIVER SETUP (Selenium fallback)
 # ==============================
 def get_driver(strategy='eager', use_uc=False, images=True):
+    if not HAS_SELENIUM or (use_uc and not HAS_UC):
+        logging.warning("Selenium/UC package not available; skipping driver creation.")
+        return None
     options = Options()
+
     import os
     proxy = os.environ.get('SCRAPER_PROXY') or os.environ.get('HTTP_PROXY') or os.environ.get('HTTPS_PROXY') or os.environ.get('http_proxy') or os.environ.get('https_proxy')
     if proxy:
