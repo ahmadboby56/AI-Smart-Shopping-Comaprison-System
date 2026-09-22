@@ -151,21 +151,26 @@ def get_driver(strategy='eager', use_uc=False, images=True):
     options.add_argument(f"--remote-debugging-port={port}")
         
     # Add a slightly more modern chrome version to UA
-    driver = webdriver.Chrome(options=options)
-    
-    # Set timeouts to prevent hanging - 40s balance
-    driver.set_page_load_timeout(40) 
-    driver.set_script_timeout(40)
-    
-    # Hide WebDriver flag
-    driver.execute_cdp_cmd("Page.addScriptToEvaluateOnNewDocument", {
-      "source": """
-        Object.defineProperty(navigator, 'webdriver', {
-          get: () => undefined
+    try:
+        driver = webdriver.Chrome(options=options)
+        
+        # Set timeouts to prevent hanging - 40s balance
+        driver.set_page_load_timeout(40) 
+        driver.set_script_timeout(40)
+        
+        # Hide WebDriver flag
+        driver.execute_cdp_cmd("Page.addScriptToEvaluateOnNewDocument", {
+          "source": """
+            Object.defineProperty(navigator, 'webdriver', {
+              get: () => undefined
+            })
+          """
         })
-      """
-    })
-    return driver
+        return driver
+    except Exception as e:
+        logging.warning(f"WebDriver.Chrome initialization failed (Chrome not available): {e}")
+        return None
+
 
 def safe_quit(driver):
     """Safely quit driver with WinError 6 protection."""
